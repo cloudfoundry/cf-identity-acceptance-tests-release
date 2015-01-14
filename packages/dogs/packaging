@@ -1,0 +1,4 @@
+# abort script on any command that exits with a non zero value
+set -e -u -x
+
+cp ${BOSH_COMPILE_TARGET}/dogs.jar ${BOSH_INSTALL_TARGET}/dogs.jar

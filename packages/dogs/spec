@@ -1,0 +1,10 @@
+---
+name: dogs
+
+dependencies: []
+
+files:
+- dogs/build.gradle
+- dogs/gradle/**/*
+- dogs/gradlew
+- dogs/**/*.java

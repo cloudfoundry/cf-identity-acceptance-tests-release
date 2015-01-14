@@ -1,0 +1,6 @@
+#!/bin/bash
+set -e -u -x
+
+dogs/gradlew -b dogs/build.gradle build
+cp dogs/build/libs/dogs.jar .
+rm -rf dogs
