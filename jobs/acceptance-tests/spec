@@ -1,5 +1,6 @@
 name: acceptance-tests
 packages:
 - jdk8
+- dogs
 templates:
   run.erb: bin/run
