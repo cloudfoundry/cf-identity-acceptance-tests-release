@@ -4,3 +4,12 @@ packages:
 - dogs
 templates:
   run.erb: bin/run
+properties:
+  idats.uaa_url:
+    description: The url to the UAA
+  idats.base_url:
+    description: The url to the login page
+  idats.admin_client_id:
+    description: Client id for the admin client registered with the UAA
+  idats.admin_client_secret:
+    description: Client secret for the admin client registered with the UAA
