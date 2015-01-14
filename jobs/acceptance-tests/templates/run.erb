@@ -3,4 +3,9 @@
 set -o errexit
 set -o nounset
 
-/var/vcap/packages/jdk8/bin/java -jar /var/vcap/packages/dogs/dogs.jar
+env\
+  integration.test.base_url=<%= p("idats.base_url") %>\
+  integration.test.uaa_url=<%= p("idats.uaa_url") %>\
+  ADMIN_CLIENT_ID=<%= p("idats.admin_client_id") %>\
+  ADMIN_CLIENT_SECRET=<%= p("idats.admin_client_secret") %>\
+  /var/vcap/packages/jdk8/bin/java -jar /var/vcap/packages/dogs/dogs.jar
