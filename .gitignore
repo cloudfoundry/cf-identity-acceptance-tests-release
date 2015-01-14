@@ -8,3 +8,7 @@ config/dev.yml
 config/private.yml
 dev_releases
 releases/*.tgz
+
+build
+.gradle
+*.iml
