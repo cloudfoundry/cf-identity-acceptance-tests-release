@@ -1,0 +1,7 @@
+---
+name: jdk8
+
+dependencies:
+
+files:
+- openjdk-1.8.0_M7.tar.gz
