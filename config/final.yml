@@ -2,4 +2,4 @@
 blobstore:
   provider: s3
   options:
-    bucket_name: blob.cfblob.com
+    bucket_name: idats-release-blobs
