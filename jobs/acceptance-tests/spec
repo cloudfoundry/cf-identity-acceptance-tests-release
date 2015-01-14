@@ -1,2 +1,4 @@
 name: acceptance-tests
-templates: {}
+packages: []
+templates:
+  run.erb: bin/run
