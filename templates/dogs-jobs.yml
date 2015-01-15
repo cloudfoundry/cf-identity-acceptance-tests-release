@@ -1,0 +1,10 @@
+jobs:
+- instances: 1
+  name: acceptance_tests
+  lifecycle: errand
+  networks:
+  - name: default
+  resource_pool: default_errand
+  templates:
+  - name: acceptance-tests
+    release: dogs

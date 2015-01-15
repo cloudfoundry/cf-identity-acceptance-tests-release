@@ -1,0 +1,30 @@
+name: dogs
+director_uuid: (( merge ))
+
+resource_pools: (( merge ))
+networks: (( merge ))
+jobs: (( merge ))
+
+releases:
+- name: dogs
+  version: latest
+
+compilation:
+  workers: 1
+  network: default
+  reuse_compilation_vms: true
+  cloud_properties: (( resource_pools.[0].cloud_properties ))
+
+update:
+  canaries: 0
+  canary_watch_time: 1000-180000
+  max_in_flight: 50
+  serial: true
+  update_watch_time: 1000-180000
+
+properties:
+  idats:
+    uaa_url: (( merge ))
+    base_url: (( merge ))
+    admin_client_id: (( merge ))
+    admin_client_secret: (( merge ))
