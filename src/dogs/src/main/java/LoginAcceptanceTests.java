@@ -30,13 +30,13 @@ import static org.junit.Assert.assertThat;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = DefaultAcceptanceTestConfig.class)
 public class LoginAcceptanceTests {
-    @Value("${integration.test.base_url}")
+    @Value("${integration.test.base_url:http://localhost:8080/uaa}")
     private String baseUrl;
 
     @Value("${ADMIN_CLIENT_ID:admin}")
     private String adminClientId;
 
-    @Value("${ADMIN_CLIENT_SECRET:admin-secret}")
+    @Value("${ADMIN_CLIENT_SECRET:adminsecret}")
     private String adminClientSecret;
 
     @Autowired

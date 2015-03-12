@@ -25,8 +25,8 @@ public class DefaultAcceptanceTestConfig {
 
     @Bean
     public TestClient testClient(RestTemplate restTemplate,
-                                 @Value("${integration.test.uaa_url}") String baseUrl,
-                                 @Value("${integration.test.uaa_url}") String uaaUrl) {
+                                 @Value("${integration.test.uaa_url:http://localhost:8080/uaa}") String baseUrl,
+                                 @Value("${integration.test.uaa_url:http://localhost:8080/uaa}") String uaaUrl) {
         return new TestClient(restTemplate, baseUrl, uaaUrl);
     }
 }
