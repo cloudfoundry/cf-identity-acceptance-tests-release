@@ -41,12 +41,6 @@ public class SamlLoginAcceptanceTests {
     @Value("${integration.test.base_url:http://localhost:8080/uaa}")
     private String baseUrl;
 
-    @Value("${ADMIN_CLIENT_ID:admin}")
-    private String adminClientId;
-
-    @Value("${ADMIN_CLIENT_SECRET:adminsecret}")
-    private String adminClientSecret;
-
     @Autowired
     private WebDriver webDriver;
 
@@ -68,7 +62,6 @@ public class SamlLoginAcceptanceTests {
     }
 
     private void samlPhpLogin(String linkText) {
-        webDriver.get("http://simplesamlphp.cfapps.io/module.php/core/authenticate.php?as=example-userpass&logout");
         webDriver.get(baseUrl + "/login");
         Assert.assertEquals("Cloud Foundry", webDriver.getTitle());
         webDriver.findElement(By.xpath("//a[text()='" + linkText + "']")).click();
@@ -77,7 +70,7 @@ public class SamlLoginAcceptanceTests {
         webDriver.findElement(By.name("username")).sendKeys("marissa");
         webDriver.findElement(By.name("password")).sendKeys("koala");
         webDriver.findElement(By.xpath("//input[@value='Login']")).click();
-        assertThat(webDriver.findElement(By.cssSelector("h1")).getText(), Matchers.containsString("Where to?"));
         assertEquals("marissa@test.org", webDriver.findElement(By.xpath("//div[@class='dropdown-trigger']")).getText());
+        assertThat(webDriver.findElement(By.cssSelector("h1")).getText(), Matchers.containsString("Where to?"));
     }
 }
