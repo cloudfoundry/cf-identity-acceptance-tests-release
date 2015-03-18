@@ -1,0 +1,9 @@
+resource_pools:
+- name: default_errand
+  network: default
+  stemcell:
+    name: bosh-aws-xen-ubuntu-trusty-go_agent
+    version: latest
+  cloud_properties:
+    instance_type: m1.medium
+    name: random

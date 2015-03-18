@@ -1,0 +1,10 @@
+networks:
+- name: default
+  subnets:
+  - range: 10.10.16.0/20
+    reserved:
+     - 10.10.16.1 - 10.10.16.33
+    static: []
+    cloud_properties:
+      name: random
+      subnet: subnet-5cc14405
