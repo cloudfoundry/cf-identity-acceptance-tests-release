@@ -31,7 +31,7 @@ import static org.junit.Assert.assertThat;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = DefaultAcceptanceTestConfig.class)
 public class SamlLoginAcceptanceTests {
-    @Value("${integration.test.base_url:http://localhost:8080/uaa}")
+    @Value("${BASE_URL}")
     private String baseUrl;
 
     @Autowired

@@ -6,6 +6,20 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.web.client.RestTemplate;
 
+/**
+ * ****************************************************************************
+ * Cloud Foundry
+ * Copyright (c) [2009-2015] Pivotal Software, Inc. All Rights Reserved.
+ * <p>
+ * This product is licensed to you under the Apache License, Version 2.0 (the "License").
+ * You may not use this product except in compliance with the License.
+ * <p>
+ * This product includes a number of subcomponents with
+ * separate copyright notices and license terms. Your use of these
+ * subcomponents is subject to the terms and conditions of the
+ * subcomponent's license, as noted in the LICENSE file.
+ * *****************************************************************************
+ */
 @Configuration
 public class DefaultAcceptanceTestConfig {
     @Bean
@@ -25,8 +39,8 @@ public class DefaultAcceptanceTestConfig {
 
     @Bean
     public TestClient testClient(RestTemplate restTemplate,
-                                 @Value("${integration.test.uaa_url:http://localhost:8080/uaa}") String baseUrl,
-                                 @Value("${integration.test.uaa_url:http://localhost:8080/uaa}") String uaaUrl) {
-        return new TestClient(restTemplate, baseUrl, uaaUrl);
+                                 @Value("${PROTOCOL}") String protocol,
+                                 @Value("${BASE_URL}") String baseUrl) {
+        return new TestClient(restTemplate, protocol + baseUrl);
     }
 }

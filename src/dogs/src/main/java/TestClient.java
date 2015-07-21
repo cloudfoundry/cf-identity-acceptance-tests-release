@@ -17,13 +17,11 @@ import java.util.regex.Pattern;
 public class TestClient {
 
     private final RestTemplate restTemplate;
-    private final String baseUrl;
-    private final String uaaUrl;
+    private final String url;
 
-    public TestClient(RestTemplate restTemplate, String baseUrl, String uaaUrl ) {
+    public TestClient(RestTemplate restTemplate, String url ) {
         this.restTemplate = restTemplate;
-        this.baseUrl = baseUrl;
-        this.uaaUrl = uaaUrl;
+        this.url = url;
     }
 
     public String getBasicAuthHeaderValue(String username, String password) {
@@ -41,7 +39,7 @@ public class TestClient {
 
         HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<MultiValueMap<String, String>>(postParameters, headers);
 
-        ResponseEntity<Map> exchange = restTemplate.exchange(baseUrl + "/oauth/token", HttpMethod.POST, requestEntity, Map.class);
+        ResponseEntity<Map> exchange = restTemplate.exchange(url + "/oauth/token", HttpMethod.POST, requestEntity, Map.class);
 
         return exchange.getBody().get("access_token").toString();
     }
@@ -57,7 +55,7 @@ public class TestClient {
                         "\"authorized_grant_types\":[\"client_credentials\"]," +
                         "\"authorities\":[\"password.write\",\"scim.write\",\"scim.read\",\"oauth.approvals\"]" +
                         "}",
-                uaaUrl + "/oauth/clients"
+                url + "/oauth/clients"
         );
     }
 
@@ -75,7 +73,7 @@ public class TestClient {
                         "\"verified\":" + verified + "," +
                         "\"schemas\":[\"urn:scim:schemas:core:1.0\"]" +
                         "}",
-                uaaUrl + "/Users"
+                url + "/Users"
         );
     }
 
@@ -88,7 +86,7 @@ public class TestClient {
                         "\"subdomain\":\"" + subdomain + "\"," +
                         "\"description\":\"" + description + "\"" +
                         "}",
-                uaaUrl + "/identity-zones"
+                url + "/identity-zones"
         );
     }
 
