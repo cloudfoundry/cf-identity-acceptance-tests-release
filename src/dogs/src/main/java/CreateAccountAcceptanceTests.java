@@ -142,7 +142,7 @@ public class CreateAccountAcceptanceTests {
     }
 
     private String fetchEmail(String username) throws InterruptedException, JSONException {
-        Thread.sleep(4000);
+        Thread.sleep(8000);
         String jsonEmail = restTemplate.getForObject("https://api.mailinator.com/api/inbox?to=" + username + "&token=" + mailinatorApiKey, String.class);
         JSONObject messages = new JSONObject(jsonEmail);
         JSONArray receivedEmails = messages.getJSONArray("messages");
