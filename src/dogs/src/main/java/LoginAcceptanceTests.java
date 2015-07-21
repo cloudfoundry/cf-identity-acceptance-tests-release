@@ -46,6 +46,8 @@ import static org.junit.Assert.assertThat;
 public class LoginAcceptanceTests {
     @Value("${BASE_URL}")
     private String baseUrl;
+    @Value("${PROTOCOL}")
+    private String protocol;
 
     @Value("${ADMIN_CLIENT_ID:admin}")
     private String adminClientId;
@@ -78,7 +80,7 @@ public class LoginAcceptanceTests {
         userName = "acceptance-" + randomInt + "@example.com";
         testClient.createUser(scimClientToken, userName, userName, "password", true);
 
-        webDriver.get(baseUrl + "/logout.do");
+        webDriver.get(protocol + baseUrl + "/logout.do");
     }
 
     @After
@@ -91,7 +93,7 @@ public class LoginAcceptanceTests {
     public void testLogin() throws Exception {
 
         // Test failed login
-        webDriver.get(baseUrl + "/login");
+        webDriver.get(protocol + baseUrl + "/login");
 
         webDriver.findElement(By.name("username")).sendKeys(userName);
         webDriver.findElement(By.name("password")).sendKeys("invalidpassword");
@@ -107,7 +109,7 @@ public class LoginAcceptanceTests {
         assertThat(webDriver.findElement(By.cssSelector("h1")).getText(), Matchers.containsString("Where to?"));
 
         // Test logout
-        webDriver.get(baseUrl + "/logout.do");
+        webDriver.get(protocol + baseUrl + "/logout.do");
 
         assertThat(webDriver.findElement(By.cssSelector("h1")).getText(), Matchers.containsString("Welcome!"));
     }

@@ -34,13 +34,16 @@ public class SamlLoginAcceptanceTests {
     @Value("${BASE_URL}")
     private String baseUrl;
 
+    @Value("${PROTOCOL}")
+    private String protocol;
+
     @Autowired
     private WebDriver webDriver;
 
     @Before
     @After
     public void clearWebDriverOfCookies() throws Exception {
-        webDriver.get(baseUrl + "/logout.do");
+        webDriver.get(protocol + baseUrl + "/logout.do");
         webDriver.manage().deleteAllCookies();
     }
 
@@ -55,7 +58,7 @@ public class SamlLoginAcceptanceTests {
     }
 
     private void samlPhpLogin(String linkText) {
-        webDriver.get(baseUrl + "/login");
+        webDriver.get(protocol + baseUrl + "/login");
         Assert.assertEquals("Cloud Foundry", webDriver.getTitle());
         webDriver.findElement(By.xpath("//a[text()='" + linkText + "']")).click();
         webDriver.findElement(By.xpath("//h2[contains(text(), 'Enter your username and password')]"));
