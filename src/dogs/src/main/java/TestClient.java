@@ -79,6 +79,19 @@ public class TestClient {
         );
     }
 
+    public void createZone(String identityAccessToken, String zoneId, String zoneName, String subdomain, String description) {
+        restfulCreate(
+                identityAccessToken,
+                "{" +
+                        "\"id\":\"" + zoneId + "\"," +
+                        "\"name\":\"" + zoneName + "\"," +
+                        "\"subdomain\":\"" + subdomain + "\"," +
+                        "\"description\":\"" + description + "\"" +
+                        "}",
+                uaaUrl + "/identity-zones"
+        );
+    }
+
     private void restfulCreate(String adminAccessToken, String json, String url) {
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", "Bearer " + adminAccessToken);
