@@ -61,7 +61,7 @@ public class SamlLoginAcceptanceTests {
         webDriver.get(protocol + baseUrl + "/login");
         Assert.assertEquals("Cloud Foundry", webDriver.getTitle());
         webDriver.findElement(By.xpath("//a[text()='" + linkText + "']")).click();
-        webDriver.findElement(By.xpath("//h2[contains(text(), 'Enter your username and password')]"));
+        webDriver.findElement(By.xpath("//h2[text()='Enter your username and password']"));
         webDriver.findElement(By.name("username")).clear();
         webDriver.findElement(By.name("username")).sendKeys("marissa");
         webDriver.findElement(By.name("password")).sendKeys("koala");
