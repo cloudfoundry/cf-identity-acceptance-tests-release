@@ -52,10 +52,10 @@ public class SamlLoginAcceptanceTests {
         samlPhpLogin("Log in with Simple SAML PHP");
     }
 
-    @Test
-    public void testUrlSamlPhpLogin() throws Exception {
-        samlPhpLogin("Log in with Simple SAML PHP URL");
-    }
+    // @Test
+    // public void testUrlSamlPhpLogin() throws Exception {
+    //     samlPhpLogin("Log in with Simple SAML PHP URL");
+    // }
 
     private void samlPhpLogin(String linkText) {
         webDriver.get(protocol + baseUrl + "/login");
