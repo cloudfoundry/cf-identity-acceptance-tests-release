@@ -6,6 +6,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.web.client.RestTemplate;
 
+import javax.annotation.PostConstruct;
+
 /**
  * ****************************************************************************
  * Cloud Foundry
@@ -42,5 +44,10 @@ public class DefaultAcceptanceTestConfig {
                                  @Value("${PROTOCOL}") String protocol,
                                  @Value("${BASE_URL}") String baseUrl) {
         return new TestClient(restTemplate, protocol + baseUrl);
+    }
+
+    @PostConstruct
+    public void init() {
+        SSLValidationDisabler.disableSSLValidation();
     }
 }
