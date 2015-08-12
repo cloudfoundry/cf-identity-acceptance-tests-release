@@ -46,8 +46,8 @@ public class LdapLoginAcceptanceTests {
 
     @Test
     public void ldap_login_IsSuccessful() {
-        webDriver.findElement(By.name("username")).sendKeys("marissa");
-        webDriver.findElement(By.name("password")).sendKeys("koala");
+        webDriver.findElement(By.name("username")).sendKeys("marissa3");
+        webDriver.findElement(By.name("password")).sendKeys("ldap3");
         webDriver.findElement(By.xpath("//input[@value='Sign in']")).click();
 
         assertThat(webDriver.findElement(By.cssSelector("h1")).getText(), Matchers.containsString("Where to?"));
