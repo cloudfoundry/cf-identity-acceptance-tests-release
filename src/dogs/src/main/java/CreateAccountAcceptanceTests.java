@@ -142,18 +142,19 @@ public class CreateAccountAcceptanceTests {
     }
 
     private String fetchEmail(String username) throws InterruptedException, JSONException {
-        int COUNT = 30;
+        int COUNT = 60;
         JSONObject receivedEmail = null;
+        String url = "http://api.mailinator.com/api/inbox?to=" + username + "&token=" + mailinatorApiKey;
         for (int i=0; receivedEmail==null && i<COUNT; i++) {
             Thread.sleep(1000);
-            String jsonEmail = restTemplate.getForObject("https://api.mailinator.com/api/inbox?to=" + username + "&token=" + mailinatorApiKey, String.class);
+            String jsonEmail = restTemplate.getForObject(url, String.class);
             JSONObject messages = new JSONObject(jsonEmail);
             JSONArray receivedEmails = messages.getJSONArray("messages");
             if (receivedEmails.length()>0) {
                 receivedEmail = (JSONObject) receivedEmails.get(0);
             }
         }
-        Assert.assertNotNull("No email was received in inbox " + username + " after " + COUNT + " seconds. Check Mailinator to see if there is an email for that inbox.", receivedEmail);
+        Assert.assertNotNull("No email was received in inbox " + username + " after " + COUNT + " seconds. Check Mailinator to see if there is an email for that inbox: "+url, receivedEmail);
         String fullEmail = restTemplate.getForObject("https://api.mailinator.com/api/email?id=" + receivedEmail.getString("id") + "&token=" + mailinatorApiKey, String.class);
         JSONObject body = new JSONObject(fullEmail);
         return ((JSONObject)body.getJSONObject("data").getJSONArray("parts").get(0)).getString("body");
