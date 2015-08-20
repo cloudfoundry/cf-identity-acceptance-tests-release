@@ -9,6 +9,7 @@ import java.util.stream.Stream;
 
 public class TestRunner {
     public static void main(String[] yo) throws Exception {
+        java.util.logging.Logger.getLogger("com.gargoylesoftware.htmlunit").setLevel(java.util.logging.Level.OFF);
         JUnitCore.main(new TestClassNames().get());
     }
 
