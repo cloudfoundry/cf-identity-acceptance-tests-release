@@ -154,8 +154,12 @@ public class CreateAccountAcceptanceTests {
                 receivedEmail = (JSONObject) receivedEmails.get(0);
             }
         }
-        Assert.assertNotNull("No email was received in inbox " + username + " after " + COUNT + " seconds. Check Mailinator to see if there is an email for that inbox: "+url, receivedEmail);
-        String fullEmail = restTemplate.getForObject("https://api.mailinator.com/api/email?id=" + receivedEmail.getString("id") + "&token=" + mailinatorApiKey, String.class);
+        Assert.assertNotNull("No email was received in inbox " + username + " after " + COUNT + " seconds. Check Mailinator to see if there is an email for that inbox: " + url, receivedEmail);
+        String fullEmail = null;
+        for (int i=0; fullEmail==null && i<COUNT; i++) {
+            Thread.sleep(1000);
+            fullEmail = restTemplate.getForObject("https://api.mailinator.com/api/email?id=" + receivedEmail.getString("id") + "&token=" + mailinatorApiKey, String.class);
+        }
         JSONObject body = new JSONObject(fullEmail);
         return ((JSONObject)body.getJSONObject("data").getJSONArray("parts").get(0)).getString("body");
     }
