@@ -70,7 +70,7 @@ public class LoginAcceptanceTests {
     public void setUp() throws Exception {
         int randomInt = new SecureRandom().nextInt();
 
-        adminClientToken = testClient.getOAuthAccessToken(adminClientId, adminClientSecret, "client_credentials", "clients.write");
+        adminClientToken = testClient.getOAuthAccessToken(adminClientId, adminClientSecret, "client_credentials", "clients.write,clients.admin");
 
         scimClientId = "acceptance-scim-" + randomInt;
         testClient.createScimClient(adminClientToken, scimClientId);
