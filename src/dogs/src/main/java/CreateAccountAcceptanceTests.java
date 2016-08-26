@@ -142,7 +142,7 @@ public class CreateAccountAcceptanceTests {
     }
 
     private String fetchEmail(String username) throws InterruptedException, JSONException {
-        int COUNT = 60;
+        int COUNT = 120;
         JSONObject receivedEmail = null;
         String url = "http://api.mailinator.com/api/inbox?to=" + username + "&token=" + mailinatorApiKey;
         for (int i=0; receivedEmail==null && i<COUNT; i++) {
