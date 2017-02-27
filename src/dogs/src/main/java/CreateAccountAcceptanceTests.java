@@ -1,6 +1,6 @@
 /*******************************************************************************
  *     Cloud Foundry
- *     Copyright (c) [2009-2014] Pivotal Software, Inc. All Rights Reserved.
+ *     Copyright (c) [2009-2017] Pivotal Software, Inc. All Rights Reserved.
  *
  *     This product is licensed to you under the Apache License, Version 2.0 (the "License").
  *     You may not use this product except in compliance with the License.
@@ -33,20 +33,7 @@ import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 
-/**
- * ****************************************************************************
- * Cloud Foundry
- * Copyright (c) [2009-2015] Pivotal Software, Inc. All Rights Reserved.
- * <p>
- * This product is licensed to you under the Apache License, Version 2.0 (the "License").
- * You may not use this product except in compliance with the License.
- * <p>
- * This product includes a number of subcomponents with
- * separate copyright notices and license terms. Your use of these
- * subcomponents is subject to the terms and conditions of the
- * subcomponent's license, as noted in the LICENSE file.
- * *****************************************************************************
- */
+
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = DefaultAcceptanceTestConfig.class)
 public class CreateAccountAcceptanceTests {
@@ -67,18 +54,20 @@ public class CreateAccountAcceptanceTests {
 
     @Value("${BASE_URL}")
     private String baseUrl;
+    private String userEmail;
 
     @Before
     public void setUp() {
         webDriver.get(protocol + baseUrl + "/logout.do");
+        userEmail = "uaa-user-" + new SecureRandom().nextInt() + "@mailinator.com";
     }
 
-    private final String mailinatorApiKey = "89e1f4da2eb0400c9894f4ebb89d1776";
+    //private final String mailinatorApiKey = "89e1f4da2eb0400c9894f4ebb89d1776";
+    //cf-coreservices-eng@pivotal.io key
+    private final String mailinatorApiKey = "183ab51a01ba475680979ddcd7b93268";
 
     @Test
     public void testSignup() throws Exception {
-        String userEmail = "user" + new SecureRandom().nextInt() + "@mailinator.com";
-
         webDriver.get(protocol + baseUrl + "/");
         webDriver.findElement(By.xpath("//*[text()='Create account']")).click();
 
@@ -119,8 +108,6 @@ public class CreateAccountAcceptanceTests {
         String identityClientToken = testClient.getOAuthAccessToken("identity", "identity_secret", "client_credentials", "zones.write");
         testClient.createZone(identityClientToken, subdomain, subdomain, subdomain, subdomain + " description");
 
-        String userEmail = "user" + new SecureRandom().nextInt() + "@mailinator.com";
-
         webDriver.get(protocol + subdomain + "." + baseUrl + "/");
         webDriver.findElement(By.xpath("//*[text()='Create account']")).click();
 
@@ -146,19 +133,22 @@ public class CreateAccountAcceptanceTests {
         JSONObject receivedEmail = null;
         String url = "http://api.mailinator.com/api/inbox?to=" + username + "&token=" + mailinatorApiKey;
         for (int i=0; receivedEmail==null && i<COUNT; i++) {
-            Thread.sleep(1000);
             String jsonEmail = restTemplate.getForObject(url, String.class);
             JSONObject messages = new JSONObject(jsonEmail);
             JSONArray receivedEmails = messages.getJSONArray("messages");
             if (receivedEmails.length()>0) {
                 receivedEmail = (JSONObject) receivedEmails.get(0);
+            } else {
+                Thread.sleep(5000);
             }
         }
         Assert.assertNotNull("No email was received in inbox " + username + " after " + COUNT + " seconds. Check Mailinator to see if there is an email for that inbox: " + url, receivedEmail);
         String fullEmail = null;
         for (int i=0; fullEmail==null && i<COUNT; i++) {
-            Thread.sleep(1000);
             fullEmail = restTemplate.getForObject("https://api.mailinator.com/api/email?id=" + receivedEmail.getString("id") + "&token=" + mailinatorApiKey, String.class);
+            if (fullEmail==null) {
+                Thread.sleep(5000);
+            }
         }
         JSONObject body = new JSONObject(fullEmail);
         return ((JSONObject)body.getJSONObject("data").getJSONArray("parts").get(0)).getString("body");
