@@ -10,8 +10,10 @@
  *     subcomponents is subject to the terms and conditions of the
  *     subcomponent's license, as noted in the LICENSE file.
  *******************************************************************************/
+
 import org.apache.commons.codec.binary.Base64;
 import org.junit.Assert;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -22,6 +24,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.HtmlUtils;
 
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -40,20 +43,50 @@ public class TestClient {
         return "Basic " + new String(Base64.encodeBase64((username + ":" + password).getBytes()));
     }
 
-    public String getOAuthAccessToken(String username, String password, String grantType, String scope) {
+    public String getClientAccessToken(String clientId, String clientSecret, String scope) {
         HttpHeaders headers = new HttpHeaders();
-        headers.add("Authorization", getBasicAuthHeaderValue(username, password));
+        headers.add("Authorization", getBasicAuthHeaderValue(clientId, clientSecret));
 
         MultiValueMap<String, String> postParameters = new LinkedMultiValueMap<String, String>();
-        postParameters.add("grant_type", grantType);
-        postParameters.add("client_id", username);
+        postParameters.add("grant_type", "client_credentials");
+        postParameters.add("client_id", clientId);
         postParameters.add("scope", scope);
+        postParameters.add("token_format", "opaque");
 
-        HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<MultiValueMap<String, String>>(postParameters, headers);
-
+        HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(postParameters, headers);
         ResponseEntity<Map> exchange = restTemplate.exchange(url + "/oauth/token", HttpMethod.POST, requestEntity, Map.class);
-
         return exchange.getBody().get("access_token").toString();
+    }
+
+    public List<Map> getIdentityProviders(String url, String token) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", "Bearer "+token);
+        headers.add("Accept", "application/json");
+        MultiValueMap<String, String> postParameters = new LinkedMultiValueMap<String, String>();
+        postParameters.add("rawConfig", "true");
+        HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(postParameters, headers);
+        ResponseEntity<List<Map>> exchange = restTemplate.exchange(url + "/identity-providers", HttpMethod.GET, requestEntity, new ParameterizedTypeReference<List<Map>>() {});
+        return exchange.getBody();
+    }
+
+    public Map<String, Object> createIdentityProvider(String url, String token, Map<String, Object> json) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", "Bearer "+token);
+        headers.add("Accept", "application/json");
+        headers.add("Content-Type", "application/json");
+        HttpEntity<Map> requestEntity = new HttpEntity<>(json, headers);
+        ResponseEntity<Map> exchange = restTemplate.exchange(url + "/identity-providers?rawConfig=true", HttpMethod.POST, requestEntity, Map.class);
+        return exchange.getBody();
+    }
+
+    public Map<String, Object> updateIdentityProvider(String url, String token, String id, Map<String, Object> json) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", "Bearer "+token);
+        headers.add("Accept", "application/json");
+        headers.add("Content-Type", "application/json");
+        HttpEntity<Map> requestEntity = new HttpEntity<>(json, headers);
+        ResponseEntity<Map> exchange = restTemplate.exchange(url + "/identity-providers/"+id+"?rawConfig=true", HttpMethod.PUT, requestEntity, Map.class);
+        return exchange.getBody();
     }
 
     public void createScimClient(String adminAccessToken, String clientId) throws Exception {

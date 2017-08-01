@@ -57,12 +57,12 @@ public class LoginAcceptanceTests {
     public void setUp() throws Exception {
         int randomInt = new SecureRandom().nextInt();
 
-        adminClientToken = testClient.getOAuthAccessToken(adminClientId, adminClientSecret, "client_credentials", "clients.write,uaa.admin");
+        adminClientToken = testClient.getClientAccessToken(adminClientId, adminClientSecret, "clients.write,uaa.admin");
 
         scimClientId = "acceptance-scim-" + randomInt;
         testClient.createScimClient(adminClientToken, scimClientId);
 
-        scimClientToken = testClient.getOAuthAccessToken(scimClientId, "scimsecret", "client_credentials", "scim.read,scim.write");
+        scimClientToken = testClient.getClientAccessToken(scimClientId, "scimsecret", "scim.read,scim.write");
 
         userName = "acceptance-" + randomInt + "@example.com";
         testClient.createUser(scimClientToken, userName, userName, "password", true);
