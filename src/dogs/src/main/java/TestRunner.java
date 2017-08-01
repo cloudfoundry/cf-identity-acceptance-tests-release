@@ -22,9 +22,6 @@ import java.util.stream.Stream;
 public class TestRunner {
     public static void main(String[] yo) throws Exception {
         java.util.logging.Logger.getLogger("com.gargoylesoftware.htmlunit").setLevel(java.util.logging.Level.OFF);
-        System.setProperty("PROTOCOL", "https://");
-        System.setProperty("BASE_URL", "uaa.identity.cf-app.com");
-        System.setProperty("ADMIN_CLIENT_SECRET", "admin_secret");
         System.setProperty("TERM", "dumb");
         JUnitCore.main(new TestClassNames().get());
     }

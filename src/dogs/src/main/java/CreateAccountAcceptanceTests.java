@@ -105,7 +105,7 @@ public class CreateAccountAcceptanceTests {
     public void testSignupInZone() throws Exception {
         String subdomain = "koala-" + new SecureRandom().nextInt();
 
-        String identityClientToken = testClient.getOAuthAccessToken("identity", "identity_secret", "client_credentials", "zones.write");
+        String identityClientToken = testClient.getClientAccessToken("identity", "identity_secret", "zones.write");
         testClient.createZone(identityClientToken, subdomain, subdomain, subdomain, subdomain + " description");
 
         webDriver.get(protocol + subdomain + "." + baseUrl + "/");
