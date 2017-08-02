@@ -51,7 +51,9 @@ public class SiteMinderIntegrationTests {
     public void setUp() {
         adminToken = testClient.getClientAccessToken(adminClientId, adminClientSecret, "");
         url = protocol + baseUrl;
+        System.out.println("Logging out from previous session.");
         webDriver.get(url + "/logout.do");
+        System.out.println("Log out complete.");
     }
 
 
@@ -87,6 +89,7 @@ public class SiteMinderIntegrationTests {
         webDriver.findElement(By.name("USER")).clear();
         webDriver.findElement(By.name("USER")).sendKeys("techuser1");
         webDriver.findElement(By.name("PASSWORD")).sendKeys("Password01");
+        webDriver.findElement(By.xpath("//input[@value='Login']")).click();
         assertThat(webDriver.findElement(By.cssSelector("h1")).getText(), Matchers.containsString("Where to?"));
     }
 

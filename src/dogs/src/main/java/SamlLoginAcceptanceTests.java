@@ -13,6 +13,7 @@
 import org.hamcrest.Matchers;
 import org.junit.After;
 import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -37,17 +38,20 @@ public class SamlLoginAcceptanceTests {
 
     @Autowired
     private WebDriver webDriver;
+    private String url;
 
     @Before
     @After
     public void clearWebDriverOfCookies() throws Exception {
+        url = protocol + baseUrl;
         webDriver.get(protocol + baseUrl + "/logout.do");
         webDriver.manage().deleteAllCookies();
     }
 
     @Test
     public void testUrlSamlPhpLogin() throws Exception {
-         samlPhpLogin("Log in with Simple SAML PHP URL");
+        Assume.assumeTrue("This test is against AWS environment", url.contains(".identity.cf-app.com"));
+        samlPhpLogin("Log in with Simple SAML PHP URL");
     }
 
     private void samlPhpLogin(String linkText) {
