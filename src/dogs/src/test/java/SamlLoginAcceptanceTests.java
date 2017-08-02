@@ -49,7 +49,7 @@ public class SamlLoginAcceptanceTests {
     }
 
     @Test
-    public void testUrlSamlPhpLogin() throws Exception {
+    public void testUrlSamlPhpLoginAWS() throws Exception {
         Assume.assumeTrue("This test is against AWS environment", url.contains(".identity.cf-app.com"));
         samlPhpLogin("Log in with Simple SAML PHP URL");
     }

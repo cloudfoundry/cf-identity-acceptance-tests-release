@@ -59,7 +59,7 @@ public class SiteMinderIntegrationTests {
 
 
     @Test
-    public void test() throws Exception {
+    public void testGCPSiteMinder() throws Exception {
         System.out.println("URL: "+url);
         Assume.assumeTrue("This test is against GCP environment", url.contains(".uaa-acceptance.cf-app.com"));
         List<Map> identityProviders = testClient.getIdentityProviders(url, adminToken);
