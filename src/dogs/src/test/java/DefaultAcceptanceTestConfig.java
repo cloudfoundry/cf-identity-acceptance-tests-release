@@ -57,7 +57,7 @@ public class DefaultAcceptanceTestConfig {
 
     @Bean
     public TestClient testClient(RestTemplate restTemplate,
-                                 @Value("${PROTOCOL}") String protocol,
+                                 @Value("${PROTOCOL:https://}") String protocol,
                                  @Value("${BASE_URL}") String baseUrl) {
         return new TestClient(restTemplate, protocol + baseUrl);
     }

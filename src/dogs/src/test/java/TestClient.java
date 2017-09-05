@@ -34,7 +34,7 @@ public class TestClient {
     private final RestTemplate restTemplate;
     private final String url;
 
-    public TestClient(RestTemplate restTemplate, String url ) {
+    public TestClient(RestTemplate restTemplate, String url) {
         this.restTemplate = restTemplate;
         this.url = url;
     }
@@ -60,18 +60,19 @@ public class TestClient {
 
     public List<Map> getIdentityProviders(String url, String token) {
         HttpHeaders headers = new HttpHeaders();
-        headers.add("Authorization", "Bearer "+token);
+        headers.add("Authorization", "Bearer " + token);
         headers.add("Accept", "application/json");
         MultiValueMap<String, String> postParameters = new LinkedMultiValueMap<String, String>();
         postParameters.add("rawConfig", "true");
         HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(postParameters, headers);
-        ResponseEntity<List<Map>> exchange = restTemplate.exchange(url + "/identity-providers", HttpMethod.GET, requestEntity, new ParameterizedTypeReference<List<Map>>() {});
+        ResponseEntity<List<Map>> exchange = restTemplate.exchange(url + "/identity-providers", HttpMethod.GET, requestEntity, new ParameterizedTypeReference<List<Map>>() {
+        });
         return exchange.getBody();
     }
 
     public Map<String, Object> createIdentityProvider(String url, String token, Map<String, Object> json) {
         HttpHeaders headers = new HttpHeaders();
-        headers.add("Authorization", "Bearer "+token);
+        headers.add("Authorization", "Bearer " + token);
         headers.add("Accept", "application/json");
         headers.add("Content-Type", "application/json");
         HttpEntity<Map> requestEntity = new HttpEntity<>(json, headers);
@@ -81,11 +82,11 @@ public class TestClient {
 
     public Map<String, Object> updateIdentityProvider(String url, String token, String id, Map<String, Object> json) {
         HttpHeaders headers = new HttpHeaders();
-        headers.add("Authorization", "Bearer "+token);
+        headers.add("Authorization", "Bearer " + token);
         headers.add("Accept", "application/json");
         headers.add("Content-Type", "application/json");
         HttpEntity<Map> requestEntity = new HttpEntity<>(json, headers);
-        ResponseEntity<Map> exchange = restTemplate.exchange(url + "/identity-providers/"+id+"?rawConfig=true", HttpMethod.PUT, requestEntity, Map.class);
+        ResponseEntity<Map> exchange = restTemplate.exchange(url + "/identity-providers/" + id + "?rawConfig=true", HttpMethod.PUT, requestEntity, Map.class);
         return exchange.getBody();
     }
 
@@ -102,6 +103,33 @@ public class TestClient {
                         "}",
                 url + "/oauth/clients"
         );
+    }
+
+    public void createPasswordClient(String adminAccessToken, String clientId, String clientSecret) {
+        restfulCreate(
+                adminAccessToken,
+                //language=JSON
+                "{\n" +
+                        "  \"scope\": [\n" +
+                        "    \"user_attributes\",\n" +
+                        "    \"openid\"\n" +
+                        "  ],\n" +
+                        "  \"client_id\": \"" + clientId + "\",\n" +
+                        "  \"client_secret\": \"" + clientSecret + "\",\n" +
+                        "  \"authorized_grant_types\": [\n" +
+                        "    \"password\"\n" +
+                        "  ]\n" +
+                        "}",
+                url + "/oauth/clients"
+        );
+    }
+
+    public void deleteClient(String adminToken, String clientId) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", "Bearer " + adminToken);
+
+        HttpEntity<String> requestEntity = new HttpEntity<>(headers);
+        restTemplate.exchange(url + "/oauth/clients/" + clientId, HttpMethod.DELETE, requestEntity, Map.class);
     }
 
     public void createUser(String scimAccessToken, String userName, String email, String password, Boolean verified) throws Exception {
@@ -153,6 +181,33 @@ public class TestClient {
         matcher.find();
         String encodedLink = matcher.group(1);
         return HtmlUtils.htmlUnescape(encodedLink);
+    }
+
+    public String getPasswordToken(String clientId, String clientSecret, String passcode) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", getBasicAuthHeaderValue(clientId, clientSecret));
+        headers.add("Content-Type", "application/x-www-form-urlencoded");
+        headers.add("Accept", "application/json");
+
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add("grant_type", "password");
+        params.add("token_format", "token");
+        params.add("passcode", passcode);
+        HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(params, headers);
+
+        ResponseEntity<Map> exchange = restTemplate.exchange(url + "/oauth/token", HttpMethod.POST, requestEntity, Map.class);
+        Map<String, Object> response = exchange.getBody();
+        return (String) response.get("access_token");
+    }
+
+    public Map<String, Object> getUserInfo(String token) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", "Bearer " + token);
+        headers.add("Accept", "application/json");
+
+        HttpEntity<String> requestEntity = new HttpEntity<>(headers);
+        ResponseEntity<Map> exchange = restTemplate.exchange(url + "/userinfo", HttpMethod.GET, requestEntity, Map.class);
+        return exchange.getBody();
     }
 }
 
