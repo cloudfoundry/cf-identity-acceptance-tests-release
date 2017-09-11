@@ -29,6 +29,8 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static org.springframework.util.StringUtils.hasText;
+
 public class TestClient {
 
     private final RestTemplate restTemplate;
@@ -91,36 +93,41 @@ public class TestClient {
     }
 
     public void createScimClient(String adminAccessToken, String clientId) throws Exception {
-        restfulCreate(
-                adminAccessToken,
-                "{" +
-                        "\"scope\":[\"uaa.none\"]," +
-                        "\"client_id\":\"" + clientId + "\"," +
-                        "\"client_secret\":\"scimsecret\"," +
-                        "\"resource_ids\":[\"oauth\"]," +
-                        "\"authorized_grant_types\":[\"client_credentials\"]," +
-                        "\"authorities\":[\"password.write\",\"scim.write\",\"scim.read\",\"oauth.approvals\"]" +
-                        "}",
-                url + "/oauth/clients"
-        );
+        restfulCreate(adminAccessToken, "{" +
+                "\"scope\":[\"uaa.none\"]," +
+                "\"client_id\":\"" + clientId + "\"," +
+                "\"client_secret\":\"scimsecret\"," +
+                "\"resource_ids\":[\"oauth\"]," +
+                "\"authorized_grant_types\":[\"client_credentials\"]," +
+                "\"authorities\":[\"password.write\",\"scim.write\",\"scim.read\",\"oauth.approvals\"]" +
+                "}", url + "/oauth/clients", null);
     }
 
     public void createPasswordClient(String adminAccessToken, String clientId, String clientSecret) {
-        restfulCreate(
-                adminAccessToken,
+        restfulCreate(adminAccessToken, "{\n" +
+                "  \"scope\": [\n" +
+                "    \"user_attributes\",\n" +
+                "    \"openid\"\n" +
+                "  ],\n" +
+                "  \"client_id\": \"" + clientId + "\",\n" +
+                "  \"client_secret\": \"" + clientSecret + "\",\n" +
+                "  \"authorized_grant_types\": [\n" +
+                "    \"password\"\n" +
+                "  ]\n" +
+                "}", url + "/oauth/clients", null);
+    }
+
+    public void createZoneAdminClient(String adminToken, String adminClientId, String adminClientSecret, String zoneId) {
+        restfulCreate(adminToken,
                 //language=JSON
                 "{\n" +
-                        "  \"scope\": [\n" +
-                        "    \"user_attributes\",\n" +
-                        "    \"openid\"\n" +
-                        "  ],\n" +
-                        "  \"client_id\": \"" + clientId + "\",\n" +
-                        "  \"client_secret\": \"" + clientSecret + "\",\n" +
-                        "  \"authorized_grant_types\": [\n" +
-                        "    \"password\"\n" +
-                        "  ]\n" +
+                        "  \"authorities\": [\"uaa.admin\"],\n" +
+                        "  \"authorized_grant_types\": [\"client_credentials\"],\n" +
+                        "  \"client_id\": \"" + adminClientId + "\",\n" +
+                        "  \"client_secret\": \"" + adminClientSecret + "\"\n" +
                         "}",
-                url + "/oauth/clients"
+                url + "/oauth/clients",
+                zoneId
         );
     }
 
@@ -134,40 +141,35 @@ public class TestClient {
 
     public void createUser(String scimAccessToken, String userName, String email, String password, Boolean verified) throws Exception {
 
-        restfulCreate(
-                scimAccessToken,
-                "{" +
-                        "\"meta\":{\"version\":0,\"created\":\"2014-03-24T18:01:24.584Z\"}," +
-                        "\"userName\":\"" + userName + "\"," +
-                        "\"name\":{\"formatted\":\"Joe User\",\"familyName\":\"User\",\"givenName\":\"Joe\"}," +
-                        "\"emails\":[{\"value\":\"" + email + "\"}]," +
-                        "\"password\":\"" + password + "\"," +
-                        "\"active\":true," +
-                        "\"verified\":" + verified + "," +
-                        "\"schemas\":[\"urn:scim:schemas:core:1.0\"]" +
-                        "}",
-                url + "/Users"
-        );
+        restfulCreate(scimAccessToken, "{" +
+                "\"meta\":{\"version\":0,\"created\":\"2014-03-24T18:01:24.584Z\"}," +
+                "\"userName\":\"" + userName + "\"," +
+                "\"name\":{\"formatted\":\"Joe User\",\"familyName\":\"User\",\"givenName\":\"Joe\"}," +
+                "\"emails\":[{\"value\":\"" + email + "\"}]," +
+                "\"password\":\"" + password + "\"," +
+                "\"active\":true," +
+                "\"verified\":" + verified + "," +
+                "\"schemas\":[\"urn:scim:schemas:core:1.0\"]" +
+                "}", url + "/Users", null);
     }
 
     public void createZone(String identityAccessToken, String zoneId, String zoneName, String subdomain, String description) {
-        restfulCreate(
-                identityAccessToken,
-                "{" +
-                        "\"id\":\"" + zoneId + "\"," +
-                        "\"name\":\"" + zoneName + "\"," +
-                        "\"subdomain\":\"" + subdomain + "\"," +
-                        "\"description\":\"" + description + "\"" +
-                        "}",
-                url + "/identity-zones"
-        );
+        restfulCreate(identityAccessToken, "{" +
+                "\"id\":\"" + zoneId + "\"," +
+                "\"name\":\"" + zoneName + "\"," +
+                "\"subdomain\":\"" + subdomain + "\"," +
+                "\"description\":\"" + description + "\"" +
+                "}", url + "/identity-zones", null);
     }
 
-    private void restfulCreate(String adminAccessToken, String json, String url) {
+    private void restfulCreate(String adminAccessToken, String json, String url, String zoneId) {
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", "Bearer " + adminAccessToken);
         headers.add("Accept", "application/json");
         headers.add("Content-Type", "application/json");
+        if (zoneId != null) {
+            headers.add("X-Identity-Zone-Id", zoneId);
+        }
 
         HttpEntity<String> requestEntity = new HttpEntity<String>(json, headers);
         ResponseEntity<Void> exchange = restTemplate.exchange(url, HttpMethod.POST, requestEntity, Void.class);
