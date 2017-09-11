@@ -1,4 +1,5 @@
 import org.hamcrest.Matchers;
+import org.junit.After;
 import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;
@@ -10,14 +11,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import static org.junit.Assert.assertThat;
-
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = DefaultAcceptanceTestConfig.class)
@@ -47,6 +43,9 @@ public class SiteMinderIntegrationTests {
 
     private String siteMinderOriginKey = "idats-siteminder";
 
+    private String clientId = "test-client-" + UUID.randomUUID();
+    private String clientSecret = clientId + "-password";
+
     @Before
     public void setUp() {
         adminToken = testClient.getClientAccessToken(adminClientId, adminClientSecret, "");
@@ -54,14 +53,44 @@ public class SiteMinderIntegrationTests {
         System.out.println("Logging out from previous session.");
         webDriver.get(url + "/logout.do");
         System.out.println("Log out complete.");
+
+        System.out.println("URL: "+url);
+        Assume.assumeTrue("This test is against GCP environment", url.contains(".uaa-acceptance.cf-app.com"));
+        setupIdp();
+        testClient.createPasswordClient(adminToken, clientId, clientSecret);
     }
 
-
+    @After
+    public void tearDown() {
+        testClient.deleteClient(adminToken, clientId);
+    }
 
     @Test
     public void testGCPSiteMinder() throws Exception {
-        System.out.println("URL: "+url);
-        Assume.assumeTrue("This test is against GCP environment", url.contains(".uaa-acceptance.cf-app.com"));
+        //browser login flow
+        webDriver.get(url + "/login");
+        webDriver.findElement(By.xpath("//a[text()='" + CA_SITEMINDER_SAML_FOR_IDATS + "']")).click();
+        webDriver.findElement(By.xpath("//b[contains(text(), 'Please Login')]"));
+
+        webDriver.findElement(By.name("USER")).clear();
+        webDriver.findElement(By.name("USER")).sendKeys("techuser1");
+        webDriver.findElement(By.name("PASSWORD")).sendKeys("Password01");
+        webDriver.findElement(By.xpath("//input[@value='Login']")).click();
+        assertThat(webDriver.findElement(By.cssSelector("h1")).getText(), Matchers.containsString("Where to?"));
+
+        webDriver.get(url + "/passcode");
+        assertThat(webDriver.findElement(By.cssSelector("h1")).getText(), Matchers.containsString("Temporary Authentication Code"));
+        String passcode = webDriver.findElement(By.cssSelector("h2")).getText();
+        System.out.println("Passcode: " + passcode);
+
+        String passwordToken = testClient.getPasswordToken(clientId, clientSecret, passcode);
+        Map<String, Object> userInfo = testClient.getUserInfo(passwordToken);
+        Map<String, Object> userAttributes = (Map<String, Object>) userInfo.get("user_attributes");
+        assertThat(userAttributes, Matchers.hasEntry("email", Arrays.asList("techuser1@gmail.com")));
+        assertThat(userAttributes, Matchers.hasEntry("idats", Arrays.asList("testvalue")));
+    }
+
+    private void setupIdp() {
         List<Map> identityProviders = testClient.getIdentityProviders(url, adminToken);
 
         Optional<Map> existingIdp = identityProviders.stream()
@@ -80,23 +109,16 @@ public class SiteMinderIntegrationTests {
                                       idp.get("active")
         );
         System.out.println(siteminderIdp);
-
-        //browser login flow
-        webDriver.get(url + "/login");
-        webDriver.findElement(By.xpath("//a[text()='" + CA_SITEMINDER_SAML_FOR_IDATS + "']")).click();
-        webDriver.findElement(By.xpath("//b[contains(text(), 'Please Login')]"));
-
-        webDriver.findElement(By.name("USER")).clear();
-        webDriver.findElement(By.name("USER")).sendKeys("techuser1");
-        webDriver.findElement(By.name("PASSWORD")).sendKeys("Password01");
-        webDriver.findElement(By.xpath("//input[@value='Login']")).click();
-        assertThat(webDriver.findElement(By.cssSelector("h1")).getText(), Matchers.containsString("Where to?"));
     }
 
     private Map<String, Object> getSiteMinderIDP() {
         Map<String, Object> config = new HashMap<>();
+        HashMap<String, String> attributeMappings = new HashMap<>();
+        attributeMappings.put("user.attribute.email", "emailaddress");
+        attributeMappings.put("user.attribute.idats", "idats");
+
         config.put("externalGroupsWhitelist", Collections.emptyList());
-        config.put("attributeMappings", Collections.emptyMap());
+        config.put("attributeMappings", attributeMappings);
         config.put("addShadowUserOnLogin", true);
         config.put("storeCustomAttributes", true);
         config.put("metaDataLocation", siteMinderMetadata);
