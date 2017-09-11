@@ -87,7 +87,7 @@ public class SiteMinderIntegrationTests {
         Map<String, Object> userInfo = testClient.getUserInfo(passwordToken);
         Map<String, Object> userAttributes = (Map<String, Object>) userInfo.get("user_attributes");
         assertThat(userAttributes, Matchers.hasEntry("email", Arrays.asList("techuser1@gmail.com")));
-        assertThat(userAttributes, Matchers.hasEntry("idats", Arrays.asList("testvalue")));
+        assertThat(userAttributes, Matchers.hasEntry("fixedCustomAttributeToTestValue", Arrays.asList("testvalue")));
     }
 
     private void setupIdp() {
@@ -115,7 +115,7 @@ public class SiteMinderIntegrationTests {
         Map<String, Object> config = new HashMap<>();
         HashMap<String, String> attributeMappings = new HashMap<>();
         attributeMappings.put("user.attribute.email", "emailaddress");
-        attributeMappings.put("user.attribute.idats", "idats");
+        attributeMappings.put("user.attribute.fixedCustomAttributeToTestValue", "idats");
 
         config.put("externalGroupsWhitelist", Collections.emptyList());
         config.put("attributeMappings", attributeMappings);
