@@ -7,6 +7,8 @@ blobs
 config/dev.yml
 config/private.yml
 dev_releases
+src/dogs/out/
+src/dogs/phantomjsdriver.log
 releases/*.tgz
 
 build
