@@ -1,8 +1,5 @@
 import org.hamcrest.Matchers;
-import org.junit.After;
-import org.junit.Assume;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -16,6 +13,7 @@ import java.util.*;
 
 import static org.junit.Assert.assertThat;
 
+@Ignore
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = DefaultAcceptanceTestConfig.class)
 public class SiteMinderIntegrationTests {
