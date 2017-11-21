@@ -56,6 +56,9 @@ public class CreateAccountAcceptanceTests {
     private String baseUrl;
     private String userEmail;
 
+    @Value("${IDENTITY_CLIENT_SECRET:identity_secret}")
+    private String identityClientSecret;
+
     @Before
     public void setUp() {
         webDriver.get(protocol + baseUrl + "/logout.do");
@@ -105,7 +108,7 @@ public class CreateAccountAcceptanceTests {
     public void testSignupInZone() throws Exception {
         String subdomain = "koala-" + new SecureRandom().nextInt();
 
-        String identityClientToken = testClient.getClientAccessToken("identity", "identity_secret", "zones.write");
+        String identityClientToken = testClient.getClientAccessToken("identity", identityClientSecret, "zones.write");
         testClient.createZone(identityClientToken, subdomain, subdomain, subdomain, subdomain + " description");
 
         webDriver.get(protocol + subdomain + "." + baseUrl + "/");
