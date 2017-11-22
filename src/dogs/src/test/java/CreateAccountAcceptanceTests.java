@@ -92,10 +92,7 @@ public class CreateAccountAcceptanceTests {
         assertFalse(isEmpty(link));
         webDriver.get(link);
 
-        assertThat(webDriver.findElement(By.cssSelector("h1")).getText(), containsString("Where to?"));
-
-        webDriver.findElement(By.xpath("//*[text()='"+userEmail+"']")).click();
-        webDriver.findElement(By.linkText("Sign Out")).click();
+        assertThat(webDriver.findElement(By.cssSelector("h1")).getText(), containsString("Welcome!"));
 
         webDriver.findElement(By.name("username")).sendKeys(userEmail);
         webDriver.findElement(By.name("password")).sendKeys(SECRET);
