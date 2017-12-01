@@ -1,0 +1,29 @@
+#!/bin/bash
+
+set -e
+
+echo "Running Identity acceptance tests"
+
+: ${BASE_URL?"Need to set BASE_URL"}
+: ${PROTOCOL?"Need to set PROTOCOL"}
+: ${ADMIN_CLIENT_SECRET?"Need to set ADMIN_CLIENT_SECRET"}
+
+export TERM=dumb
+
+mkdir -p ~/.gradle
+echo "org.gradle.daemon=false" >> ~/.gradle/gradle.properties
+
+cat > ~/.gradle/init.gradle <<EOL
+allprojects {
+  tasks.withType(Test) {
+    testLogging {
+      events "passed", "skipped", "failed"
+      exceptionFormat "full"
+    }
+  }
+}
+EOL
+
+echo "Running IDATS tests against ${PROTOCOL}${BASE_URL}"
+
+./gradlew clean test
