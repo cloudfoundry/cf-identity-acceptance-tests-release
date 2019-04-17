@@ -131,7 +131,7 @@ public class CreateAccountAcceptanceTests {
     private String fetchEmail(String username) throws InterruptedException, JSONException {
         int COUNT = 120;
         JSONObject receivedEmail = null;
-        String url = "http://api.mailinator.com/api/inbox?to=" + username + "&token=" + mailinatorApiKey;
+        String url = "https://api.mailinator.com/api/inbox?to=" + username + "&token=" + mailinatorApiKey;
         for (int i=0; receivedEmail==null && i<COUNT; i++) {
             String jsonEmail = restTemplate.getForObject(url, String.class);
             JSONObject messages = new JSONObject(jsonEmail);
