@@ -13,3 +13,5 @@ properties:
     description: Client id for the admin client registered with the UAA
   idats.admin_client_secret:
     description: Client secret for the admin client registered with the UAA
+  idats.mailinator_api_key:
+    description: API key for Mailinator service owned by CF Core services

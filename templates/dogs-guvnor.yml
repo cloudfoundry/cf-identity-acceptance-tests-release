@@ -28,3 +28,4 @@ properties:
     base_url: (( merge ))
     admin_client_id: (( merge ))
     admin_client_secret: (( merge ))
+    mailinator_api_key: (( merge ))

@@ -65,9 +65,9 @@ public class CreateAccountAcceptanceTests {
         userEmail = "uaa-user-" + new SecureRandom().nextInt() + "@mailinator.com";
     }
 
-    //private final String mailinatorApiKey = "89e1f4da2eb0400c9894f4ebb89d1776";
     //cf-coreservices-eng@pivotal.io key
-    private final String mailinatorApiKey = "183ab51a01ba475680979ddcd7b93268";
+    @Value("${MAILINATOR_API_KEY}")
+    private String mailinatorApiKey;
 
     @Test
     public void testSignup() throws Exception {
