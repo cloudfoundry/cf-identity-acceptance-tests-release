@@ -16,7 +16,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
@@ -71,7 +70,6 @@ public class CreateAccountAcceptanceTests {
     private String mailinatorApiKey;
 
     @Test
-    @Ignore
     public void testSignup() throws Exception {
         webDriver.get(protocol + baseUrl + "/");
         webDriver.findElement(By.xpath("//*[text()='Create account']")).click();
@@ -104,7 +102,6 @@ public class CreateAccountAcceptanceTests {
     }
 
     @Test
-    @Ignore
     public void testSignupInZone() throws Exception {
         String subdomain = "koala-" + new SecureRandom().nextInt();
 
