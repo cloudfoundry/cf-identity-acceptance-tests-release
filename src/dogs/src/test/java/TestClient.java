@@ -29,8 +29,6 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static org.springframework.util.StringUtils.hasText;
-
 public class TestClient {
 
     private final RestTemplate restTemplate;

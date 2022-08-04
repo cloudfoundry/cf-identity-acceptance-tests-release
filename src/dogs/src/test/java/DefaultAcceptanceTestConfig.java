@@ -10,15 +10,8 @@
  *     subcomponents is subject to the terms and conditions of the
  *     subcomponent's license, as noted in the LICENSE file.
  *******************************************************************************/
-import com.gargoylesoftware.htmlunit.Page;
-import com.gargoylesoftware.htmlunit.RefreshHandler;
-import com.gargoylesoftware.htmlunit.WebClient;
 import org.openqa.selenium.Dimension;
-import org.openqa.selenium.Platform;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
-import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 import org.openqa.selenium.phantomjs.PhantomJSDriver;
 import org.openqa.selenium.phantomjs.PhantomJSDriverService;
 import org.openqa.selenium.remote.DesiredCapabilities;
@@ -29,9 +22,6 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.PostConstruct;
-import java.io.IOException;
-import java.net.URL;
-import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
 @Configuration
