@@ -33,7 +33,7 @@ dependencies {
     compile "junit:junit:4.11"
     compile 'com.fasterxml.jackson.core:jackson-core:2.5.0'
     compile 'com.fasterxml.jackson.core:jackson-databind:2.5.0'
-    compile 'org.reflections:reflections:0.9.9'
+    compile 'org.reflections:reflections:0.10.2'
     compile(group: 'com.github.detro.ghostdriver', name: 'phantomjsdriver', version:'1.1.0') {
         exclude(module: 'servlet-api-2.5')
     }
