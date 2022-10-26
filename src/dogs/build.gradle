@@ -25,7 +25,7 @@ repositories {
 }
 // In this section you declare the dependencies for your production and test code
 dependencies {
-    implementation("org.springframework:spring-context:5.3.22")
+    implementation("org.springframework:spring-context:5.3.23")
     implementation("org.springframework:spring-web:5.3.23")
     implementation("org.springframework:spring-test:5.3.23")
     implementation(group: "org.hamcrest", name: "hamcrest-all", version:"1.3")
