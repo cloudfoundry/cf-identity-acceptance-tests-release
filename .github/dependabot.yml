@@ -10,3 +10,6 @@ updates:
     schedule:
       interval: daily
       time: "11:00"
+    ignore:
+      - dependency-name: "org.springframework.boot:*"
+        update-types: ["version-update:semver-major"] # v3 requires java 17
