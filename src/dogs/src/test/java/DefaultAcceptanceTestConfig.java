@@ -32,6 +32,7 @@ public class DefaultAcceptanceTestConfig {
     public WebDriver webDriver() {
         System.setProperty("webdriver.chrome.logfile", "/tmp/chromedriver.log");
         System.setProperty("webdriver.chrome.verboseLogging", "true");
+        System.setProperty("webdriver.http.factory", "jdk-http-client");
 
         ChromeOptions options = new ChromeOptions();
         options.addArguments(
@@ -42,7 +43,8 @@ public class DefaultAcceptanceTestConfig {
                 "--allow-running-insecure-content",
                 "--allow-insecure-localhost",
                 "--no-sandbox",
-                "--disable-gpu"
+                "--disable-gpu",
+                "--remote-allow-origins=*"
         );
 
         options.setAcceptInsecureCerts(true);
