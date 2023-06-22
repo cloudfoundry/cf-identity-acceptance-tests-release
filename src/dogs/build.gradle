@@ -39,7 +39,7 @@ dependencies {
     implementation("com.fasterxml.jackson.core:jackson-databind")
     implementation("org.reflections:reflections:0.10.2")
     implementation("javax.annotation:javax.annotation-api")
-    implementation("org.json:json:20230227")
+    implementation("org.json:json:20230618")
     implementation("org.apache.commons:commons-lang3")
     implementation("commons-codec:commons-codec")
 }
