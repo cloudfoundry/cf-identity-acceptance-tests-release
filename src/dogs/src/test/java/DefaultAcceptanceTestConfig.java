@@ -10,6 +10,7 @@
  *     subcomponents is subject to the terms and conditions of the
  *     subcomponent's license, as noted in the LICENSE file.
  *******************************************************************************/
+import org.openqa.selenium.Dimension;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
@@ -20,9 +21,14 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.PostConstruct;
+import java.time.Duration;
 
 @Configuration
 public class DefaultAcceptanceTestConfig {
+    static final Duration IMPLICIT_WAIT_TIME = Duration.ofSeconds(30L);
+    static final Duration PAGE_LOAD_TIMEOUT = Duration.ofSeconds(40L);
+    static final Duration SCRIPT_TIMEOUT = Duration.ofSeconds(30L);
+
     @Bean
     public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
         return new PropertySourcesPlaceholderConfigurer();
@@ -36,20 +42,26 @@ public class DefaultAcceptanceTestConfig {
 
         ChromeOptions options = new ChromeOptions();
         options.addArguments(
-                "--verbose",
-                "--headless",
-                "--disable-web-security",
-                "--ignore-certificate-errors",
-                "--allow-running-insecure-content",
-                "--allow-insecure-localhost",
-                "--no-sandbox",
-                "--disable-gpu",
-                "--remote-allow-origins=*"
+            "--headless=old",
+            "--window-position=-2400,-2400",
+            "--window-size=1024,768",
+            "--disable-web-security",
+            "--ignore-certificate-errors",
+            "--allow-running-insecure-content",
+            "--allow-insecure-localhost",
+            "--no-sandbox",
+            "--disable-gpu",
+            "--remote-allow-origins=*"
         );
 
         options.setAcceptInsecureCerts(true);
 
         ChromeDriver driver = new ChromeDriver(options);
+        driver.manage().timeouts()
+            .implicitlyWait(IMPLICIT_WAIT_TIME)
+            .pageLoadTimeout(PAGE_LOAD_TIMEOUT)
+            .scriptTimeout(SCRIPT_TIMEOUT);
+        driver.manage().window().setSize(new Dimension(1024, 768));
         return driver;
     }
 
