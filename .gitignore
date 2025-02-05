@@ -3,6 +3,7 @@
 .final_builds/jobs/**/*.tgz
 .final_builds/packages/**/*.tgz
 .idea
+init.gradle
 blobs
 config/dev.yml
 config/private.yml
