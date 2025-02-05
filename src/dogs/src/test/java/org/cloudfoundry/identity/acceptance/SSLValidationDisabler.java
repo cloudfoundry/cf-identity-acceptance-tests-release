@@ -1,4 +1,4 @@
-/*******************************************************************************
+package org.cloudfoundry.identity.acceptance; /*******************************************************************************
  *     Cloud Foundry
  *     Copyright (c) [2009-2017] Pivotal Software, Inc. All Rights Reserved.
  *

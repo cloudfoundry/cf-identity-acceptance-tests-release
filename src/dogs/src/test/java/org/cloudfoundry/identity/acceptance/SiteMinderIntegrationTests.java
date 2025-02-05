@@ -1,3 +1,5 @@
+package org.cloudfoundry.identity.acceptance;
+
 import org.hamcrest.Matchers;
 import org.junit.*;
 import org.junit.runner.RunWith;

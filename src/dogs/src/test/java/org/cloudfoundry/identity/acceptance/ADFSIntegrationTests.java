@@ -1,3 +1,5 @@
+package org.cloudfoundry.identity.acceptance;
+
 import org.hamcrest.Matchers;
 import org.junit.Assume;
 import org.junit.Before;
