@@ -28,6 +28,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class SiteMinderIntegrationTests {
 
     public static final String CA_SITEMINDER_SAML_FOR_IDATS = "CA Siteminder SAML for IDaTS";
+
     @Value("${BASE_URL}")
     private String baseUrl;
 
@@ -70,7 +71,7 @@ public class SiteMinderIntegrationTests {
     }
 
     @Test
-    void gcpSiteMinder() throws Exception {
+    void gcpSiteMinder() {
         setupIdp(testClient, baseUrlWithProtocol, adminToken, siteMinderMetadata);
         testClient.createPasswordClient(adminToken, clientId, clientSecret);
 
@@ -83,7 +84,7 @@ public class SiteMinderIntegrationTests {
     }
 
     @Test
-    void gcpSiteMinderOnNonSystemZone() throws Exception {
+    void gcpSiteMinderOnNonSystemZone() {
         String zoneId = "idats";
         String zoneUrl = protocol + zoneId + "." + baseUrl;
         TestClient zoneClient = new TestClient(restTemplate, zoneUrl);
@@ -183,7 +184,7 @@ public class SiteMinderIntegrationTests {
         return result;
     }
 
-    private String siteMinderMetadata = """
+    private final String siteMinderMetadata = """
             <EntityDescriptor xmlns="urn:oasis:names:tc:SAML:2.0:metadata" ID="SM24275085546f8ff6a82b78b6b7ec0e8b844be4a712f" entityID="smidp">
                 <ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
             <ds:SignedInfo>
@@ -240,7 +241,7 @@ public class SiteMinderIntegrationTests {
                 </IDPSSODescriptor>
             </EntityDescriptor>""";
 
-    private String siteMinderMetadataForIDATsZone = """
+    private final String siteMinderMetadataForIDATsZone = """
             <EntityDescriptor xmlns="urn:oasis:names:tc:SAML:2.0:metadata" ID="SMe827ddf0248edff0f4ccba51881b6c02eda0b4daf9d" entityID="smidp">
                 <ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
             <ds:SignedInfo>

@@ -12,10 +12,8 @@
  *******************************************************************************/
 package org.cloudfoundry.identity.acceptance;
 
-import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 import java.security.GeneralSecurityException;
@@ -44,15 +42,9 @@ public class SSLValidationDisabler {
             SSLContext sc = SSLContext.getInstance("SSL");
             sc.init(null, trustAllCerts, new SecureRandom());
             HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
-            HttpsURLConnection.setDefaultHostnameVerifier(new HostnameVerifier() {
-                @Override
-                public boolean verify(String hostname, SSLSession session) {
-                    return true;
-                }
-            });
+            HttpsURLConnection.setDefaultHostnameVerifier((hostname, session) -> true);
         } catch (GeneralSecurityException e) {
             // ignore
         }
     }
-
 }

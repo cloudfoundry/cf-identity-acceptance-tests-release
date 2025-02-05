@@ -79,7 +79,7 @@ public class ADFSIntegrationTests {
     }
 
     @Test
-    void gcpAdfs() throws Exception {
+    void gcpAdfs() {
         setupIdp(testClient, baseUrlWithProtocol, adminToken, adfsMetadata);
         testClient.createPasswordClient(adminToken, clientId, clientSecret);
 
@@ -92,7 +92,7 @@ public class ADFSIntegrationTests {
     }
 
     @Test
-    void gcpAdfsNonSystemZone() throws Exception {
+    void gcpAdfsNonSystemZone() {
         String zoneId = "idats";
         String zoneUrl = protocol + zoneId + "." + baseUrl;
         TestClient zoneClient = new TestClient(restTemplate, zoneUrl);

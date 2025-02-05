@@ -29,6 +29,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = DefaultAcceptanceTestConfig.class)
 class SamlLoginAcceptanceTests {
+
     @Value("${BASE_URL}")
     private String baseUrl;
 
@@ -48,7 +49,7 @@ class SamlLoginAcceptanceTests {
     }
 
     @Test
-    void urlSamlPhpLoginAWS() throws Exception {
+    void urlSamlPhpLoginAWS() {
         Assumptions.assumeTrue(url.contains(".identity.cf-app.com"), "This test is against AWS environment");
         samlPhpLogin("Log in with Simple SAML PHP URL");
     }

@@ -30,8 +30,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = DefaultAcceptanceTestConfig.class)
 class LoginAcceptanceTests {
+
     @Value("${BASE_URL}")
     private String baseUrl;
+
     @Value("${PROTOCOL}")
     private String protocol;
 
@@ -68,8 +70,7 @@ class LoginAcceptanceTests {
 
     @AfterEach
     void tearDown() throws Exception {
-        // TODO: Delete User
-        // TODO: Delete SCIM Client
+        // TODO: Delete User & SCIM Client
     }
 
     @Test
