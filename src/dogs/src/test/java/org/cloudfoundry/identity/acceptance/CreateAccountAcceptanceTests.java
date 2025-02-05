@@ -69,7 +69,7 @@ public class CreateAccountAcceptanceTests {
     private String mailinatorApiKey;
 
     @Test
-    @Disabled
+    @Disabled("Since May 2021, Temporarily ignore testSignup*")
     void signup() throws Exception {
         webDriver.get(protocol + baseUrl + "/");
         webDriver.findElement(By.xpath("//*[text()='Create account']")).click();
@@ -102,7 +102,7 @@ public class CreateAccountAcceptanceTests {
     }
 
     @Test
-    @Disabled
+    @Disabled("Since May 2021, Temporarily ignore testSignup*")
     void signupInZone() throws Exception {
         String subdomain = "koala-" + new SecureRandom().nextInt();
 

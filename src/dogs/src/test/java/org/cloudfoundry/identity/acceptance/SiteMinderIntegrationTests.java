@@ -22,7 +22,7 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@Disabled
+@Disabled("Since Oct 2017, add ignore to siteminder AT until Siteminder comes back up")
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = DefaultAcceptanceTestConfig.class)
 public class SiteMinderIntegrationTests {

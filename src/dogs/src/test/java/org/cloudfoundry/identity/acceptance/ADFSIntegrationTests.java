@@ -24,7 +24,7 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@Disabled
+@Disabled("Since Oct 2017, Pend ADFS to unblock uaa-acceptance-gcp pipeline")
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = DefaultAcceptanceTestConfig.class)
 public class ADFSIntegrationTests {
