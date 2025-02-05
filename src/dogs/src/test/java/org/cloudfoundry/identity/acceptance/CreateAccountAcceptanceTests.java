@@ -1,4 +1,4 @@
-package org.cloudfoundry.identity.acceptance; /*******************************************************************************
+/* ******************************************************************************
  *     Cloud Foundry
  *     Copyright (c) [2009-2017] Pivotal Software, Inc. All Rights Reserved.
  *
@@ -10,6 +10,7 @@ package org.cloudfoundry.identity.acceptance; /*********************************
  *     subcomponents is subject to the terms and conditions of the
  *     subcomponent's license, as noted in the LICENSE file.
  *******************************************************************************/
+package org.cloudfoundry.identity.acceptance;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -132,28 +133,28 @@ public class CreateAccountAcceptanceTests {
     }
 
     private String fetchEmail(String username) throws InterruptedException, JSONException {
-        int COUNT = 120;
+        int maxTimesToCheck = 120;
         JSONObject receivedEmail = null;
         String url = "https://api.mailinator.com/api/inbox?to=" + username + "&token=" + mailinatorApiKey;
-        for (int i=0; receivedEmail==null && i<COUNT; i++) {
+        for (int i = 0; receivedEmail == null && i < maxTimesToCheck; i++) {
             String jsonEmail = restTemplate.getForObject(url, String.class);
             JSONObject messages = new JSONObject(jsonEmail);
             JSONArray receivedEmails = messages.getJSONArray("messages");
-            if (receivedEmails.length()>0) {
+            if (receivedEmails.length() > 0) {
                 receivedEmail = (JSONObject) receivedEmails.get(0);
             } else {
                 Thread.sleep(5000);
             }
         }
-        Assert.assertNotNull("No email was received in inbox " + username + " after " + COUNT + " seconds. Check Mailinator to see if there is an email for that inbox: " + url, receivedEmail);
+        Assert.assertNotNull("No email was received in inbox " + username + " after " + maxTimesToCheck + " seconds. Check Mailinator to see if there is an email for that inbox: " + url, receivedEmail);
         String fullEmail = null;
-        for (int i=0; fullEmail==null && i<COUNT; i++) {
+        for (int i = 0; fullEmail == null && i < maxTimesToCheck; i++) {
             fullEmail = restTemplate.getForObject("https://api.mailinator.com/api/email?id=" + receivedEmail.getString("id") + "&token=" + mailinatorApiKey, String.class);
-            if (fullEmail==null) {
+            if (fullEmail == null) {
                 Thread.sleep(5000);
             }
         }
         JSONObject body = new JSONObject(fullEmail);
-        return ((JSONObject)body.getJSONObject("data").getJSONArray("parts").get(0)).getString("body");
+        return ((JSONObject) body.getJSONObject("data").getJSONArray("parts").get(0)).getString("body");
     }
 }

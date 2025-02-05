@@ -1,7 +1,10 @@
 package org.cloudfoundry.identity.acceptance;
 
 import org.hamcrest.Matchers;
-import org.junit.*;
+import org.junit.Assume;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -11,7 +14,13 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.Assert.assertThat;
 
@@ -60,7 +69,7 @@ public class SiteMinderIntegrationTests {
         webDriver.get(baseUrlWithProtocol + "/logout.do");
         System.out.println("Log out complete.");
 
-        System.out.println("URL: "+ baseUrlWithProtocol);
+        System.out.println("URL: " + baseUrlWithProtocol);
         Assume.assumeTrue("This test is against GCP environment", baseUrlWithProtocol.contains(".uaa-acceptance.cf-app.com"));
     }
 
@@ -133,19 +142,19 @@ public class SiteMinderIntegrationTests {
         List<Map> identityProviders = zoneClient.getIdentityProviders(zoneUrl, adminToken);
 
         Optional<Map> existingIdp = identityProviders.stream()
-            .filter(entry -> siteMinderOriginKey.equals(entry.get("originKey")))
-            .findFirst();
+                .filter(entry -> siteMinderOriginKey.equals(entry.get("originKey")))
+                .findFirst();
 
         Map<String, Object> idp = existingIdp.isPresent() ?
-            zoneClient.updateIdentityProvider(zoneUrl, adminToken, (String) existingIdp.get().get("id"), getSiteMinderIDP(idpMetadata)) :
-            zoneClient.createIdentityProvider(zoneUrl, adminToken, getSiteMinderIDP(idpMetadata));
+                zoneClient.updateIdentityProvider(zoneUrl, adminToken, (String) existingIdp.get().get("id"), getSiteMinderIDP(idpMetadata)) :
+                zoneClient.createIdentityProvider(zoneUrl, adminToken, getSiteMinderIDP(idpMetadata));
 
-        String siteminderIdp = String.format("Created IDP:\n\tid:%s\n\tname:%s\n\ttype:%s\n\torigin:%s\n\tactive:%s",
-                                      idp.get("id"),
-                                      idp.get("name"),
-                                      idp.get("type"),
-                                      idp.get("originKey"),
-                                      idp.get("active")
+        String siteminderIdp = "Created IDP:%n\tid:%s%n\tname:%s%n\ttype:%s%n\torigin:%s%n\tactive:%s".formatted(
+                idp.get("id"),
+                idp.get("name"),
+                idp.get("type"),
+                idp.get("originKey"),
+                idp.get("active")
         );
         System.out.println(siteminderIdp);
     }
@@ -177,116 +186,119 @@ public class SiteMinderIntegrationTests {
         return result;
     }
 
-    private String siteMinderMetadata = "<EntityDescriptor xmlns=\"urn:oasis:names:tc:SAML:2.0:metadata\" ID=\"SM24275085546f8ff6a82b78b6b7ec0e8b844be4a712f\" entityID=\"smidp\">\n" +
-        "    <ds:Signature xmlns:ds=\"http://www.w3.org/2000/09/xmldsig#\">\n" +
-        "<ds:SignedInfo>\n" +
-        "<ds:CanonicalizationMethod Algorithm=\"http://www.w3.org/2001/10/xml-exc-c14n#\"/>\n" +
-        "<ds:SignatureMethod Algorithm=\"http://www.w3.org/2000/09/xmldsig#rsa-sha1\"/>\n" +
-        "<ds:Reference URI=\"#SM24275085546f8ff6a82b78b6b7ec0e8b844be4a712f\">\n" +
-        "<ds:Transforms>\n" +
-        "<ds:Transform Algorithm=\"http://www.w3.org/2000/09/xmldsig#enveloped-signature\"/>\n" +
-        "<ds:Transform Algorithm=\"http://www.w3.org/2001/10/xml-exc-c14n#\"/>\n" +
-        "</ds:Transforms>\n" +
-        "<ds:DigestMethod Algorithm=\"http://www.w3.org/2000/09/xmldsig#sha1\"/>\n" +
-        "<ds:DigestValue>3ZtZZEFfzdtuNNc287FE57fqdv0=</ds:DigestValue>\n" +
-        "</ds:Reference>\n" +
-        "</ds:SignedInfo>\n" +
-        "<ds:SignatureValue>\n" +
-        "ExBS934avWExVcQmWELBgyFXcuzRZmT9wfAUVlq5gKclkQ9MKAe0rn6Vhx5I1ZQCUd8E+lVBpZWG\n" +
-        "B+YeyKt18ScnDa6cY2Ume0Sa41PXO6mFfvaB4MrkIzte909DcRyjongNVN8JUCJ7J2+ZVQAxoANc\n" +
-        "kQoFs9EIir7vfw3er6E=\n" +
-        "</ds:SignatureValue>\n" +
-        "<ds:KeyInfo>\n" +
-        "<ds:X509Data>\n" +
-        "<ds:X509Certificate>\n" +
-        "MIICRzCCAbCgAwIBAgIEUtf+gjANBgkqhkiG9w0BAQQFADBoMQswCQYDVQQGEwJVUzERMA8GA1UE\n" +
-        "CBMIbmV3IHlvcmsxETAPBgNVBAcTCGlzbGFuZGlhMQswCQYDVQQKEwJjYTERMA8GA1UECxMIc2Vj\n" +
-        "dXJpdHkxEzARBgNVBAMTCnNpdGVtaW5kZXIwHhcNMTQwMTE2MTU0NTA2WhcNMjQwMTE0MTU0NTA2\n" +
-        "WjBoMQswCQYDVQQGEwJVUzERMA8GA1UECBMIbmV3IHlvcmsxETAPBgNVBAcTCGlzbGFuZGlhMQsw\n" +
-        "CQYDVQQKEwJjYTERMA8GA1UECxMIc2VjdXJpdHkxEzARBgNVBAMTCnNpdGVtaW5kZXIwgZ8wDQYJ\n" +
-        "KoZIhvcNAQEBBQADgY0AMIGJAoGBAOap0m7c+LSOAoGLUD3TAdS7BcJFns6HPSGAYK9NBY6MxITK\n" +
-        "ElqVWHaVoaqxHCQxdQsF9oZvhPAmiNsbIRniKA+cypUov8U0pNIRPPBfl7p9ojGPZf5OtotnUnEN\n" +
-        "2ZcYuZwxRnKPfpfEs5fshSvcZIa34FCSCw8L0sRDoWFIucBjAgMBAAEwDQYJKoZIhvcNAQEEBQAD\n" +
-        "gYEAFbsuhxBm3lUkycfZZuNYft1j41k+FyLLTyXyPJKmc2s2RPOYtLQyolNB214ZCIZzVSExyfo9\n" +
-        "59ZBvdWz+UinpFNPd8cEc0nuXOmfW/XBEgT0YS1vIDUzfeVRyZLj2u4BdBGwmK5oYRbgHxViFVnn\n" +
-        "3C6UN5rcg5mZl0FBXJ31Zuk=\n" +
-        "</ds:X509Certificate>\n" +
-        "</ds:X509Data>\n" +
-        "</ds:KeyInfo>\n" +
-        "</ds:Signature><IDPSSODescriptor ID=\"SM1e7cc516f5c67b77db2c635512344647444b86d60d5\" WantAuthnRequestsSigned=\"false\" protocolSupportEnumeration=\"urn:oasis:names:tc:SAML:2.0:protocol\">\n" +
-        "        <KeyDescriptor use=\"signing\">\n" +
-        "            <ns1:KeyInfo xmlns:ns1=\"http://www.w3.org/2000/09/xmldsig#\" Id=\"SM1187dd08160b3a97e700c3ea76001bee06dd4fbd4a\">\n" +
-        "                <ns1:X509Data>\n" +
-        "                    <ns1:X509IssuerSerial>\n" +
-        "                        <ns1:X509IssuerName>CN=siteminder,OU=security,O=ca,L=islandia,ST=new york,C=US</ns1:X509IssuerName>\n" +
-        "                        <ns1:X509SerialNumber>1389887106</ns1:X509SerialNumber>\n" +
-        "                    </ns1:X509IssuerSerial>\n" +
-        "                    <ns1:X509Certificate>MIICRzCCAbCgAwIBAgIEUtf+gjANBgkqhkiG9w0BAQQFADBoMQswCQYDVQQGEwJVUzERMA8GA1UECBMIbmV3IHlvcmsxETAPBgNVBAcTCGlzbGFuZGlhMQswCQYDVQQKEwJjYTERMA8GA1UECxMIc2VjdXJpdHkxEzARBgNVBAMTCnNpdGVtaW5kZXIwHhcNMTQwMTE2MTU0NTA2WhcNMjQwMTE0MTU0NTA2WjBoMQswCQYDVQQGEwJVUzERMA8GA1UECBMIbmV3IHlvcmsxETAPBgNVBAcTCGlzbGFuZGlhMQswCQYDVQQKEwJjYTERMA8GA1UECxMIc2VjdXJpdHkxEzARBgNVBAMTCnNpdGVtaW5kZXIwgZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJAoGBAOap0m7c+LSOAoGLUD3TAdS7BcJFns6HPSGAYK9NBY6MxITKElqVWHaVoaqxHCQxdQsF9oZvhPAmiNsbIRniKA+cypUov8U0pNIRPPBfl7p9ojGPZf5OtotnUnEN2ZcYuZwxRnKPfpfEs5fshSvcZIa34FCSCw8L0sRDoWFIucBjAgMBAAEwDQYJKoZIhvcNAQEEBQADgYEAFbsuhxBm3lUkycfZZuNYft1j41k+FyLLTyXyPJKmc2s2RPOYtLQyolNB214ZCIZzVSExyfo959ZBvdWz+UinpFNPd8cEc0nuXOmfW/XBEgT0YS1vIDUzfeVRyZLj2u4BdBGwmK5oYRbgHxViFVnn3C6UN5rcg5mZl0FBXJ31Zuk=</ns1:X509Certificate>\n" +
-        "                    <ns1:X509SubjectName>CN=siteminder,OU=security,O=ca,L=islandia,ST=new york,C=US</ns1:X509SubjectName>\n" +
-        "                </ns1:X509Data>\n" +
-        "            </ns1:KeyInfo>\n" +
-        "        </KeyDescriptor>\n" +
-        "        <NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress</NameIDFormat>\n" +
-        "        <SingleSignOnService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect\" Location=\"https://vp6.casecurecenter.com/affwebservices/public/saml2sso\"/>\n" +
-        "        <SingleSignOnService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\" Location=\"https://vp6.casecurecenter.com/affwebservices/public/saml2sso\"/>\n" +
-        "        <ns2:Attribute xmlns:ns2=\"urn:oasis:names:tc:SAML:2.0:assertion\" Name=\"emailaddress\" NameFormat=\"urn:oasis:names:tc:SAML:2.0:attrname-format:unspecified\"/>\n" +
-        "    </IDPSSODescriptor>\n" +
-        "</EntityDescriptor>";
+    private String siteMinderMetadata = """
+            <EntityDescriptor xmlns="urn:oasis:names:tc:SAML:2.0:metadata" ID="SM24275085546f8ff6a82b78b6b7ec0e8b844be4a712f" entityID="smidp">
+                <ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+            <ds:SignedInfo>
+            <ds:CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+            <ds:SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>
+            <ds:Reference URI="#SM24275085546f8ff6a82b78b6b7ec0e8b844be4a712f">
+            <ds:Transforms>
+            <ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/>
+            <ds:Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+            </ds:Transforms>
+            <ds:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>
+            <ds:DigestValue>3ZtZZEFfzdtuNNc287FE57fqdv0=</ds:DigestValue>
+            </ds:Reference>
+            </ds:SignedInfo>
+            <ds:SignatureValue>
+            ExBS934avWExVcQmWELBgyFXcuzRZmT9wfAUVlq5gKclkQ9MKAe0rn6Vhx5I1ZQCUd8E+lVBpZWG
+            B+YeyKt18ScnDa6cY2Ume0Sa41PXO6mFfvaB4MrkIzte909DcRyjongNVN8JUCJ7J2+ZVQAxoANc
+            kQoFs9EIir7vfw3er6E=
+            </ds:SignatureValue>
+            <ds:KeyInfo>
+            <ds:X509Data>
+            <ds:X509Certificate>
+            MIICRzCCAbCgAwIBAgIEUtf+gjANBgkqhkiG9w0BAQQFADBoMQswCQYDVQQGEwJVUzERMA8GA1UE
+            CBMIbmV3IHlvcmsxETAPBgNVBAcTCGlzbGFuZGlhMQswCQYDVQQKEwJjYTERMA8GA1UECxMIc2Vj
+            dXJpdHkxEzARBgNVBAMTCnNpdGVtaW5kZXIwHhcNMTQwMTE2MTU0NTA2WhcNMjQwMTE0MTU0NTA2
+            WjBoMQswCQYDVQQGEwJVUzERMA8GA1UECBMIbmV3IHlvcmsxETAPBgNVBAcTCGlzbGFuZGlhMQsw
+            CQYDVQQKEwJjYTERMA8GA1UECxMIc2VjdXJpdHkxEzARBgNVBAMTCnNpdGVtaW5kZXIwgZ8wDQYJ
+            KoZIhvcNAQEBBQADgY0AMIGJAoGBAOap0m7c+LSOAoGLUD3TAdS7BcJFns6HPSGAYK9NBY6MxITK
+            ElqVWHaVoaqxHCQxdQsF9oZvhPAmiNsbIRniKA+cypUov8U0pNIRPPBfl7p9ojGPZf5OtotnUnEN
+            2ZcYuZwxRnKPfpfEs5fshSvcZIa34FCSCw8L0sRDoWFIucBjAgMBAAEwDQYJKoZIhvcNAQEEBQAD
+            gYEAFbsuhxBm3lUkycfZZuNYft1j41k+FyLLTyXyPJKmc2s2RPOYtLQyolNB214ZCIZzVSExyfo9
+            59ZBvdWz+UinpFNPd8cEc0nuXOmfW/XBEgT0YS1vIDUzfeVRyZLj2u4BdBGwmK5oYRbgHxViFVnn
+            3C6UN5rcg5mZl0FBXJ31Zuk=
+            </ds:X509Certificate>
+            </ds:X509Data>
+            </ds:KeyInfo>
+            </ds:Signature><IDPSSODescriptor ID="SM1e7cc516f5c67b77db2c635512344647444b86d60d5" WantAuthnRequestsSigned="false" protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
+                    <KeyDescriptor use="signing">
+                        <ns1:KeyInfo xmlns:ns1="http://www.w3.org/2000/09/xmldsig#" Id="SM1187dd08160b3a97e700c3ea76001bee06dd4fbd4a">
+                            <ns1:X509Data>
+                                <ns1:X509IssuerSerial>
+                                    <ns1:X509IssuerName>CN=siteminder,OU=security,O=ca,L=islandia,ST=new york,C=US</ns1:X509IssuerName>
+                                    <ns1:X509SerialNumber>1389887106</ns1:X509SerialNumber>
+                                </ns1:X509IssuerSerial>
+                                <ns1:X509Certificate>MIICRzCCAbCgAwIBAgIEUtf+gjANBgkqhkiG9w0BAQQFADBoMQswCQYDVQQGEwJVUzERMA8GA1UECBMIbmV3IHlvcmsxETAPBgNVBAcTCGlzbGFuZGlhMQswCQYDVQQKEwJjYTERMA8GA1UECxMIc2VjdXJpdHkxEzARBgNVBAMTCnNpdGVtaW5kZXIwHhcNMTQwMTE2MTU0NTA2WhcNMjQwMTE0MTU0NTA2WjBoMQswCQYDVQQGEwJVUzERMA8GA1UECBMIbmV3IHlvcmsxETAPBgNVBAcTCGlzbGFuZGlhMQswCQYDVQQKEwJjYTERMA8GA1UECxMIc2VjdXJpdHkxEzARBgNVBAMTCnNpdGVtaW5kZXIwgZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJAoGBAOap0m7c+LSOAoGLUD3TAdS7BcJFns6HPSGAYK9NBY6MxITKElqVWHaVoaqxHCQxdQsF9oZvhPAmiNsbIRniKA+cypUov8U0pNIRPPBfl7p9ojGPZf5OtotnUnEN2ZcYuZwxRnKPfpfEs5fshSvcZIa34FCSCw8L0sRDoWFIucBjAgMBAAEwDQYJKoZIhvcNAQEEBQADgYEAFbsuhxBm3lUkycfZZuNYft1j41k+FyLLTyXyPJKmc2s2RPOYtLQyolNB214ZCIZzVSExyfo959ZBvdWz+UinpFNPd8cEc0nuXOmfW/XBEgT0YS1vIDUzfeVRyZLj2u4BdBGwmK5oYRbgHxViFVnn3C6UN5rcg5mZl0FBXJ31Zuk=</ns1:X509Certificate>
+                                <ns1:X509SubjectName>CN=siteminder,OU=security,O=ca,L=islandia,ST=new york,C=US</ns1:X509SubjectName>
+                            </ns1:X509Data>
+                        </ns1:KeyInfo>
+                    </KeyDescriptor>
+                    <NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress</NameIDFormat>
+                    <SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://vp6.casecurecenter.com/affwebservices/public/saml2sso"/>
+                    <SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://vp6.casecurecenter.com/affwebservices/public/saml2sso"/>
+                    <ns2:Attribute xmlns:ns2="urn:oasis:names:tc:SAML:2.0:assertion" Name="emailaddress" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:unspecified"/>
+                </IDPSSODescriptor>
+            </EntityDescriptor>""";
 
-    private String siteMinderMetadataForIDATsZone = "<EntityDescriptor xmlns=\"urn:oasis:names:tc:SAML:2.0:metadata\" ID=\"SMe827ddf0248edff0f4ccba51881b6c02eda0b4daf9d\" entityID=\"smidp\">\n" +
-            "    <ds:Signature xmlns:ds=\"http://www.w3.org/2000/09/xmldsig#\">\n" +
-            "<ds:SignedInfo>\n" +
-            "<ds:CanonicalizationMethod Algorithm=\"http://www.w3.org/2001/10/xml-exc-c14n#\"/>\n" +
-            "<ds:SignatureMethod Algorithm=\"http://www.w3.org/2000/09/xmldsig#rsa-sha1\"/>\n" +
-            "<ds:Reference URI=\"#SMe827ddf0248edff0f4ccba51881b6c02eda0b4daf9d\">\n" +
-            "<ds:Transforms>\n" +
-            "<ds:Transform Algorithm=\"http://www.w3.org/2000/09/xmldsig#enveloped-signature\"/>\n" +
-            "<ds:Transform Algorithm=\"http://www.w3.org/2001/10/xml-exc-c14n#\"/>\n" +
-            "</ds:Transforms>\n" +
-            "<ds:DigestMethod Algorithm=\"http://www.w3.org/2000/09/xmldsig#sha1\"/>\n" +
-            "<ds:DigestValue>j/VL/zvY/Jcry7hPCdTHpgpMdNw=</ds:DigestValue>\n" +
-            "</ds:Reference>\n" +
-            "</ds:SignedInfo>\n" +
-            "<ds:SignatureValue>\n" +
-            "UdaN2v2+r+MZmSEiUju9MYH8B9h6kopPEyIyNoPzEKkG7F4nNubp/zL6Zww/Oz0/jnRicCxsWfeZ\n" +
-            "rfx2LqnDK4VMdFwBQIsHFdFgmv8kR56YyKcujz7ECzCQ+nQngxbUapqmtdTiAx1AGlWH4K/sGHsJ\n" +
-            "338Gno6dtivDoWfUsUg=\n" +
-            "</ds:SignatureValue>\n" +
-            "<ds:KeyInfo>\n" +
-            "<ds:X509Data>\n" +
-            "<ds:X509Certificate>\n" +
-            "MIICRzCCAbCgAwIBAgIEUtf+gjANBgkqhkiG9w0BAQQFADBoMQswCQYDVQQGEwJVUzERMA8GA1UE\n" +
-            "CBMIbmV3IHlvcmsxETAPBgNVBAcTCGlzbGFuZGlhMQswCQYDVQQKEwJjYTERMA8GA1UECxMIc2Vj\n" +
-            "dXJpdHkxEzARBgNVBAMTCnNpdGVtaW5kZXIwHhcNMTQwMTE2MTU0NTA2WhcNMjQwMTE0MTU0NTA2\n" +
-            "WjBoMQswCQYDVQQGEwJVUzERMA8GA1UECBMIbmV3IHlvcmsxETAPBgNVBAcTCGlzbGFuZGlhMQsw\n" +
-            "CQYDVQQKEwJjYTERMA8GA1UECxMIc2VjdXJpdHkxEzARBgNVBAMTCnNpdGVtaW5kZXIwgZ8wDQYJ\n" +
-            "KoZIhvcNAQEBBQADgY0AMIGJAoGBAOap0m7c+LSOAoGLUD3TAdS7BcJFns6HPSGAYK9NBY6MxITK\n" +
-            "ElqVWHaVoaqxHCQxdQsF9oZvhPAmiNsbIRniKA+cypUov8U0pNIRPPBfl7p9ojGPZf5OtotnUnEN\n" +
-            "2ZcYuZwxRnKPfpfEs5fshSvcZIa34FCSCw8L0sRDoWFIucBjAgMBAAEwDQYJKoZIhvcNAQEEBQAD\n" +
-            "gYEAFbsuhxBm3lUkycfZZuNYft1j41k+FyLLTyXyPJKmc2s2RPOYtLQyolNB214ZCIZzVSExyfo9\n" +
-            "59ZBvdWz+UinpFNPd8cEc0nuXOmfW/XBEgT0YS1vIDUzfeVRyZLj2u4BdBGwmK5oYRbgHxViFVnn\n" +
-            "3C6UN5rcg5mZl0FBXJ31Zuk=\n" +
-            "</ds:X509Certificate>\n" +
-            "</ds:X509Data>\n" +
-            "</ds:KeyInfo>\n" +
-            "</ds:Signature><IDPSSODescriptor ID=\"SM12098efdb66f91efc594587f20e3666ee6da3941f02e\" WantAuthnRequestsSigned=\"false\" protocolSupportEnumeration=\"urn:oasis:names:tc:SAML:2.0:protocol\">\n" +
-            "        <KeyDescriptor use=\"signing\">\n" +
-            "            <ns1:KeyInfo xmlns:ns1=\"http://www.w3.org/2000/09/xmldsig#\" Id=\"SMa2a8c8f61398c19ae8c6d8a03f1e67bc6da0171ec16\">\n" +
-            "                <ns1:X509Data>\n" +
-            "                    <ns1:X509IssuerSerial>\n" +
-            "                        <ns1:X509IssuerName>CN=siteminder,OU=security,O=ca,L=islandia,ST=new york,C=US</ns1:X509IssuerName>\n" +
-            "                        <ns1:X509SerialNumber>1389887106</ns1:X509SerialNumber>\n" +
-            "                    </ns1:X509IssuerSerial>\n" +
-            "                    <ns1:X509Certificate>MIICRzCCAbCgAwIBAgIEUtf+gjANBgkqhkiG9w0BAQQFADBoMQswCQYDVQQGEwJVUzERMA8GA1UECBMIbmV3IHlvcmsxETAPBgNVBAcTCGlzbGFuZGlhMQswCQYDVQQKEwJjYTERMA8GA1UECxMIc2VjdXJpdHkxEzARBgNVBAMTCnNpdGVtaW5kZXIwHhcNMTQwMTE2MTU0NTA2WhcNMjQwMTE0MTU0NTA2WjBoMQswCQYDVQQGEwJVUzERMA8GA1UECBMIbmV3IHlvcmsxETAPBgNVBAcTCGlzbGFuZGlhMQswCQYDVQQKEwJjYTERMA8GA1UECxMIc2VjdXJpdHkxEzARBgNVBAMTCnNpdGVtaW5kZXIwgZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJAoGBAOap0m7c+LSOAoGLUD3TAdS7BcJFns6HPSGAYK9NBY6MxITKElqVWHaVoaqxHCQxdQsF9oZvhPAmiNsbIRniKA+cypUov8U0pNIRPPBfl7p9ojGPZf5OtotnUnEN2ZcYuZwxRnKPfpfEs5fshSvcZIa34FCSCw8L0sRDoWFIucBjAgMBAAEwDQYJKoZIhvcNAQEEBQADgYEAFbsuhxBm3lUkycfZZuNYft1j41k+FyLLTyXyPJKmc2s2RPOYtLQyolNB214ZCIZzVSExyfo959ZBvdWz+UinpFNPd8cEc0nuXOmfW/XBEgT0YS1vIDUzfeVRyZLj2u4BdBGwmK5oYRbgHxViFVnn3C6UN5rcg5mZl0FBXJ31Zuk=</ns1:X509Certificate>\n" +
-            "                    <ns1:X509SubjectName>CN=siteminder,OU=security,O=ca,L=islandia,ST=new york,C=US</ns1:X509SubjectName>\n" +
-            "                </ns1:X509Data>\n" +
-            "            </ns1:KeyInfo>\n" +
-            "        </KeyDescriptor>\n" +
-            "        <NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress</NameIDFormat>\n" +
-            "        <SingleSignOnService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect\" Location=\"https://vp6.casecurecenter.com/affwebservices/public/saml2sso\"/>\n" +
-            "        <SingleSignOnService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\" Location=\"https://vp6.casecurecenter.com/affwebservices/public/saml2sso\"/>\n" +
-            "        <ns2:Attribute xmlns:ns2=\"urn:oasis:names:tc:SAML:2.0:assertion\" Name=\"emailaddress\" NameFormat=\"urn:oasis:names:tc:SAML:2.0:attrname-format:unspecified\"/>\n" +
-            "        <ns3:Attribute xmlns:ns3=\"urn:oasis:names:tc:SAML:2.0:assertion\" Name=\"idats\" NameFormat=\"urn:oasis:names:tc:SAML:2.0:attrname-format:unspecified\"/>\n" +
-            "    </IDPSSODescriptor>\n" +
-            "</EntityDescriptor>\n";
+    private String siteMinderMetadataForIDATsZone = """
+            <EntityDescriptor xmlns="urn:oasis:names:tc:SAML:2.0:metadata" ID="SMe827ddf0248edff0f4ccba51881b6c02eda0b4daf9d" entityID="smidp">
+                <ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+            <ds:SignedInfo>
+            <ds:CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+            <ds:SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>
+            <ds:Reference URI="#SMe827ddf0248edff0f4ccba51881b6c02eda0b4daf9d">
+            <ds:Transforms>
+            <ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/>
+            <ds:Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+            </ds:Transforms>
+            <ds:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>
+            <ds:DigestValue>j/VL/zvY/Jcry7hPCdTHpgpMdNw=</ds:DigestValue>
+            </ds:Reference>
+            </ds:SignedInfo>
+            <ds:SignatureValue>
+            UdaN2v2+r+MZmSEiUju9MYH8B9h6kopPEyIyNoPzEKkG7F4nNubp/zL6Zww/Oz0/jnRicCxsWfeZ
+            rfx2LqnDK4VMdFwBQIsHFdFgmv8kR56YyKcujz7ECzCQ+nQngxbUapqmtdTiAx1AGlWH4K/sGHsJ
+            338Gno6dtivDoWfUsUg=
+            </ds:SignatureValue>
+            <ds:KeyInfo>
+            <ds:X509Data>
+            <ds:X509Certificate>
+            MIICRzCCAbCgAwIBAgIEUtf+gjANBgkqhkiG9w0BAQQFADBoMQswCQYDVQQGEwJVUzERMA8GA1UE
+            CBMIbmV3IHlvcmsxETAPBgNVBAcTCGlzbGFuZGlhMQswCQYDVQQKEwJjYTERMA8GA1UECxMIc2Vj
+            dXJpdHkxEzARBgNVBAMTCnNpdGVtaW5kZXIwHhcNMTQwMTE2MTU0NTA2WhcNMjQwMTE0MTU0NTA2
+            WjBoMQswCQYDVQQGEwJVUzERMA8GA1UECBMIbmV3IHlvcmsxETAPBgNVBAcTCGlzbGFuZGlhMQsw
+            CQYDVQQKEwJjYTERMA8GA1UECxMIc2VjdXJpdHkxEzARBgNVBAMTCnNpdGVtaW5kZXIwgZ8wDQYJ
+            KoZIhvcNAQEBBQADgY0AMIGJAoGBAOap0m7c+LSOAoGLUD3TAdS7BcJFns6HPSGAYK9NBY6MxITK
+            ElqVWHaVoaqxHCQxdQsF9oZvhPAmiNsbIRniKA+cypUov8U0pNIRPPBfl7p9ojGPZf5OtotnUnEN
+            2ZcYuZwxRnKPfpfEs5fshSvcZIa34FCSCw8L0sRDoWFIucBjAgMBAAEwDQYJKoZIhvcNAQEEBQAD
+            gYEAFbsuhxBm3lUkycfZZuNYft1j41k+FyLLTyXyPJKmc2s2RPOYtLQyolNB214ZCIZzVSExyfo9
+            59ZBvdWz+UinpFNPd8cEc0nuXOmfW/XBEgT0YS1vIDUzfeVRyZLj2u4BdBGwmK5oYRbgHxViFVnn
+            3C6UN5rcg5mZl0FBXJ31Zuk=
+            </ds:X509Certificate>
+            </ds:X509Data>
+            </ds:KeyInfo>
+            </ds:Signature><IDPSSODescriptor ID="SM12098efdb66f91efc594587f20e3666ee6da3941f02e" WantAuthnRequestsSigned="false" protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
+                    <KeyDescriptor use="signing">
+                        <ns1:KeyInfo xmlns:ns1="http://www.w3.org/2000/09/xmldsig#" Id="SMa2a8c8f61398c19ae8c6d8a03f1e67bc6da0171ec16">
+                            <ns1:X509Data>
+                                <ns1:X509IssuerSerial>
+                                    <ns1:X509IssuerName>CN=siteminder,OU=security,O=ca,L=islandia,ST=new york,C=US</ns1:X509IssuerName>
+                                    <ns1:X509SerialNumber>1389887106</ns1:X509SerialNumber>
+                                </ns1:X509IssuerSerial>
+                                <ns1:X509Certificate>MIICRzCCAbCgAwIBAgIEUtf+gjANBgkqhkiG9w0BAQQFADBoMQswCQYDVQQGEwJVUzERMA8GA1UECBMIbmV3IHlvcmsxETAPBgNVBAcTCGlzbGFuZGlhMQswCQYDVQQKEwJjYTERMA8GA1UECxMIc2VjdXJpdHkxEzARBgNVBAMTCnNpdGVtaW5kZXIwHhcNMTQwMTE2MTU0NTA2WhcNMjQwMTE0MTU0NTA2WjBoMQswCQYDVQQGEwJVUzERMA8GA1UECBMIbmV3IHlvcmsxETAPBgNVBAcTCGlzbGFuZGlhMQswCQYDVQQKEwJjYTERMA8GA1UECxMIc2VjdXJpdHkxEzARBgNVBAMTCnNpdGVtaW5kZXIwgZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJAoGBAOap0m7c+LSOAoGLUD3TAdS7BcJFns6HPSGAYK9NBY6MxITKElqVWHaVoaqxHCQxdQsF9oZvhPAmiNsbIRniKA+cypUov8U0pNIRPPBfl7p9ojGPZf5OtotnUnEN2ZcYuZwxRnKPfpfEs5fshSvcZIa34FCSCw8L0sRDoWFIucBjAgMBAAEwDQYJKoZIhvcNAQEEBQADgYEAFbsuhxBm3lUkycfZZuNYft1j41k+FyLLTyXyPJKmc2s2RPOYtLQyolNB214ZCIZzVSExyfo959ZBvdWz+UinpFNPd8cEc0nuXOmfW/XBEgT0YS1vIDUzfeVRyZLj2u4BdBGwmK5oYRbgHxViFVnn3C6UN5rcg5mZl0FBXJ31Zuk=</ns1:X509Certificate>
+                                <ns1:X509SubjectName>CN=siteminder,OU=security,O=ca,L=islandia,ST=new york,C=US</ns1:X509SubjectName>
+                            </ns1:X509Data>
+                        </ns1:KeyInfo>
+                    </KeyDescriptor>
+                    <NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress</NameIDFormat>
+                    <SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://vp6.casecurecenter.com/affwebservices/public/saml2sso"/>
+                    <SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://vp6.casecurecenter.com/affwebservices/public/saml2sso"/>
+                    <ns2:Attribute xmlns:ns2="urn:oasis:names:tc:SAML:2.0:assertion" Name="emailaddress" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:unspecified"/>
+                    <ns3:Attribute xmlns:ns3="urn:oasis:names:tc:SAML:2.0:assertion" Name="idats" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:unspecified"/>
+                </IDPSSODescriptor>
+            </EntityDescriptor>
+            """;
 }

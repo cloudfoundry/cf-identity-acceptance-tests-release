@@ -1,4 +1,4 @@
-package org.cloudfoundry.identity.acceptance; /*******************************************************************************
+/* ******************************************************************************
  *     Cloud Foundry
  *     Copyright (c) [2009-2017] Pivotal Software, Inc. All Rights Reserved.
  *
@@ -10,6 +10,9 @@ package org.cloudfoundry.identity.acceptance; /*********************************
  *     subcomponents is subject to the terms and conditions of the
  *     subcomponent's license, as noted in the LICENSE file.
  *******************************************************************************/
+package org.cloudfoundry.identity.acceptance;
+
+import jakarta.annotation.PostConstruct;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
@@ -19,7 +22,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.web.client.RestTemplate;
 
-import jakarta.annotation.PostConstruct;
 import java.time.Duration;
 
 @Configuration
@@ -41,23 +43,23 @@ public class DefaultAcceptanceTestConfig {
 
         ChromeOptions options = new ChromeOptions();
         options.addArguments(
-            "--headless",
-            "--disable-web-security",
-            "--ignore-certificate-errors",
-            "--allow-running-insecure-content",
-            "--allow-insecure-localhost",
-            "--no-sandbox",
-            "--disable-gpu",
-            "--remote-allow-origins=*"
+                "--headless",
+                "--disable-web-security",
+                "--ignore-certificate-errors",
+                "--allow-running-insecure-content",
+                "--allow-insecure-localhost",
+                "--no-sandbox",
+                "--disable-gpu",
+                "--remote-allow-origins=*"
         );
 
         options.setAcceptInsecureCerts(true);
 
         ChromeDriver driver = new ChromeDriver(options);
         driver.manage().timeouts()
-            .implicitlyWait(IMPLICIT_WAIT_TIME)
-            .pageLoadTimeout(PAGE_LOAD_TIMEOUT)
-            .scriptTimeout(SCRIPT_TIMEOUT);
+                .implicitlyWait(IMPLICIT_WAIT_TIME)
+                .pageLoadTimeout(PAGE_LOAD_TIMEOUT)
+                .scriptTimeout(SCRIPT_TIMEOUT);
         return driver;
     }
 

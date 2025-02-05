@@ -1,4 +1,4 @@
-package org.cloudfoundry.identity.acceptance; /*******************************************************************************
+/* ******************************************************************************
  *     Cloud Foundry
  *     Copyright (c) [2009-2017] Pivotal Software, Inc. All Rights Reserved.
  *
@@ -10,7 +10,7 @@ package org.cloudfoundry.identity.acceptance; /*********************************
  *     subcomponents is subject to the terms and conditions of the
  *     subcomponent's license, as noted in the LICENSE file.
  *******************************************************************************/
-
+package org.cloudfoundry.identity.acceptance;
 
 import org.hamcrest.Matchers;
 import org.junit.After;

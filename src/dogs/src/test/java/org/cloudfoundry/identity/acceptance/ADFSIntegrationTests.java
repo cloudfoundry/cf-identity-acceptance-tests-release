@@ -16,7 +16,13 @@ import org.springframework.web.client.RestTemplate;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Scanner;
+import java.util.UUID;
 
 import static org.junit.Assert.assertThat;
 
@@ -150,7 +156,7 @@ public class ADFSIntegrationTests {
                 zoneClient.updateIdentityProvider(zoneUrl, adminToken, (String) existingIdp.get().get("id"), getAdfsIDP(idpMetadata)) :
                 zoneClient.createIdentityProvider(zoneUrl, adminToken, getAdfsIDP(idpMetadata));
 
-        String adfsIdp = String.format("Created IDP:\n\tid:%s\n\tname:%s\n\ttype:%s\n\torigin:%s\n\tactive:%s",
+        String adfsIdp = "Created IDP:%n\tid:%s%n\tname:%s%n\ttype:%s%n\torigin:%s%n\tactive:%s".formatted(
                 idp.get("id"),
                 idp.get("name"),
                 idp.get("type"),
