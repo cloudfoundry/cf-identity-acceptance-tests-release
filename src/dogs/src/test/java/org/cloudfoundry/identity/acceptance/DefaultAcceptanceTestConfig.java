@@ -19,7 +19,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.web.client.RestTemplate;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 import java.time.Duration;
 
 @Configuration
