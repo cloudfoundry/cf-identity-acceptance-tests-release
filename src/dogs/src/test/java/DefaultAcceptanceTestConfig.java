@@ -10,7 +10,6 @@
  *     subcomponents is subject to the terms and conditions of the
  *     subcomponent's license, as noted in the LICENSE file.
  *******************************************************************************/
-import org.openqa.selenium.Dimension;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
@@ -42,9 +41,7 @@ public class DefaultAcceptanceTestConfig {
 
         ChromeOptions options = new ChromeOptions();
         options.addArguments(
-            "--headless=old",
-            "--window-position=-2400,-2400",
-            "--window-size=1024,768",
+            "--headless",
             "--disable-web-security",
             "--ignore-certificate-errors",
             "--allow-running-insecure-content",
@@ -61,7 +58,6 @@ public class DefaultAcceptanceTestConfig {
             .implicitlyWait(IMPLICIT_WAIT_TIME)
             .pageLoadTimeout(PAGE_LOAD_TIMEOUT)
             .scriptTimeout(SCRIPT_TIMEOUT);
-        driver.manage().window().setSize(new Dimension(1024, 768));
         return driver;
     }
 
