@@ -13,7 +13,6 @@
 package org.cloudfoundry.identity.acceptance;
 
 import org.apache.commons.codec.binary.Base64;
-import org.junit.Assert;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -29,6 +28,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestClient {
 
@@ -189,7 +190,7 @@ public class TestClient {
 
         HttpEntity<String> requestEntity = new HttpEntity<>(json, headers);
         ResponseEntity<Void> exchange = restTemplate.exchange(url, HttpMethod.POST, requestEntity, Void.class);
-        Assert.assertEquals(HttpStatus.CREATED, exchange.getStatusCode());
+        assertThat(exchange.getStatusCode()).isEqualTo(HttpStatus.CREATED);
     }
 
     public String extractLink(String messageBody) {

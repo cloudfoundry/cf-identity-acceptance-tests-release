@@ -12,24 +12,22 @@
  *******************************************************************************/
 package org.cloudfoundry.identity.acceptance;
 
-import org.hamcrest.Matchers;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
-@RunWith(SpringJUnit4ClassRunner.class)
+@ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = DefaultAcceptanceTestConfig.class)
-public class LdapLoginAcceptanceTests {
-
+class LdapLoginAcceptanceTests {
 
     @Value("${BASE_URL}")
     private String baseUrl;
@@ -40,22 +38,22 @@ public class LdapLoginAcceptanceTests {
     @Autowired
     private WebDriver webDriver;
 
-    @Before
-    @After
-    public void clearWebDriverOfCookies() {
+    @BeforeEach
+    @AfterEach
+    void clearWebDriverOfCookies() {
         webDriver.get(protocol + baseUrl + "/logout.do");
     }
 
     @Test
-    public void ldap_login_IsSuccessful() {
+    void ldap_login_IsSuccessful() {
         webDriver.findElement(By.name("username")).sendKeys("marissa-ldap");
         webDriver.findElement(By.name("password")).sendKeys("marissa-ldap");
         webDriver.findElement(By.xpath("//input[@value='Sign in']")).click();
 
-        assertThat(webDriver.findElement(By.cssSelector("h1")).getText(), Matchers.containsString("Where to?"));
+        assertThat(webDriver.findElement(By.cssSelector("h1")).getText()).contains("Where to?");
 
         webDriver.get(protocol + baseUrl + "/logout.do");
 
-        assertThat(webDriver.findElement(By.cssSelector("h1")).getText(), Matchers.containsString("Welcome!"));
+        assertThat(webDriver.findElement(By.cssSelector("h1")).getText()).contains("Welcome!");
     }
 }

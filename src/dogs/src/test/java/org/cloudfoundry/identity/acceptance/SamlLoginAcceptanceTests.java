@@ -12,26 +12,23 @@
  *******************************************************************************/
 package org.cloudfoundry.identity.acceptance;
 
-import org.hamcrest.Matchers;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Assume;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assumptions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
-@RunWith(SpringJUnit4ClassRunner.class)
+@ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = DefaultAcceptanceTestConfig.class)
-public class SamlLoginAcceptanceTests {
+class SamlLoginAcceptanceTests {
     @Value("${BASE_URL}")
     private String baseUrl;
 
@@ -42,30 +39,30 @@ public class SamlLoginAcceptanceTests {
     private WebDriver webDriver;
     private String url;
 
-    @Before
-    @After
-    public void clearWebDriverOfCookies() throws Exception {
+    @BeforeEach
+    @AfterEach
+    void clearWebDriverOfCookies() {
         url = protocol + baseUrl;
         webDriver.get(protocol + baseUrl + "/logout.do");
         webDriver.manage().deleteAllCookies();
     }
 
     @Test
-    public void testUrlSamlPhpLoginAWS() throws Exception {
-        Assume.assumeTrue("This test is against AWS environment", url.contains(".identity.cf-app.com"));
+    void urlSamlPhpLoginAWS() throws Exception {
+        Assumptions.assumeTrue(url.contains(".identity.cf-app.com"), "This test is against AWS environment");
         samlPhpLogin("Log in with Simple SAML PHP URL");
     }
 
     private void samlPhpLogin(String linkText) {
         webDriver.get(protocol + baseUrl + "/login");
-        Assert.assertEquals("Cloud Foundry", webDriver.getTitle());
+        assertThat(webDriver.getTitle()).isEqualTo("Cloud Foundry");
         webDriver.findElement(By.xpath("//a[text()='" + linkText + "']")).click();
         webDriver.findElement(By.xpath("//h2[text()='Enter your username and password']"));
         webDriver.findElement(By.name("username")).clear();
         webDriver.findElement(By.name("username")).sendKeys("marissa");
         webDriver.findElement(By.name("password")).sendKeys("koala");
         webDriver.findElement(By.xpath("//input[@value='Login']")).click();
-        assertEquals("marissa@test.org", webDriver.findElement(By.xpath("//div[@class='dropdown-trigger']")).getText());
-        assertThat(webDriver.findElement(By.cssSelector("h1")).getText(), Matchers.containsString("Where to?"));
+        assertThat(webDriver.findElement(By.xpath("//div[@class='dropdown-trigger']")).getText()).isEqualTo("marissa@test.org");
+        assertThat(webDriver.findElement(By.cssSelector("h1")).getText()).contains("Where to?");
     }
 }

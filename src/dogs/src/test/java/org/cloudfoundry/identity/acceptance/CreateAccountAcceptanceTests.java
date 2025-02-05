@@ -15,28 +15,25 @@ package org.cloudfoundry.identity.acceptance;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.client.RestTemplate;
 
 import java.security.SecureRandom;
 
 import static org.apache.commons.lang3.StringUtils.isEmpty;
-import static org.hamcrest.Matchers.containsString;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 
-@RunWith(SpringJUnit4ClassRunner.class)
+@ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = DefaultAcceptanceTestConfig.class)
 public class CreateAccountAcceptanceTests {
 
@@ -61,8 +58,8 @@ public class CreateAccountAcceptanceTests {
     @Value("${IDENTITY_CLIENT_SECRET:identity_secret}")
     private String identityClientSecret;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         webDriver.get(protocol + baseUrl + "/logout.do");
         userEmail = "uaa-user-" + new SecureRandom().nextInt() + "@mailinator.com";
     }
@@ -72,12 +69,12 @@ public class CreateAccountAcceptanceTests {
     private String mailinatorApiKey;
 
     @Test
-    @Ignore
-    public void testSignup() throws Exception {
+    @Disabled
+    void signup() throws Exception {
         webDriver.get(protocol + baseUrl + "/");
         webDriver.findElement(By.xpath("//*[text()='Create account']")).click();
 
-        Assert.assertEquals("Create your account", webDriver.findElement(By.tagName("h1")).getText());
+        assertThat(webDriver.findElement(By.tagName("h1")).getText()).isEqualTo("Create your account");
 
 
         webDriver.findElement(By.name("email")).sendKeys(userEmail);
@@ -86,27 +83,27 @@ public class CreateAccountAcceptanceTests {
 
         webDriver.findElement(By.xpath("//input[@value='Send activation link']")).click();
 
-        Assert.assertEquals("Create your account", webDriver.findElement(By.tagName("h1")).getText());
-        Assert.assertEquals("Please check email for an activation link.", webDriver.findElement(By.cssSelector(".instructions-sent")).getText());
+        assertThat(webDriver.findElement(By.tagName("h1")).getText()).isEqualTo("Create your account");
+        assertThat(webDriver.findElement(By.cssSelector(".instructions-sent")).getText()).isEqualTo("Please check email for an activation link.");
 
         String email = fetchEmail(userEmail.split("@")[0]);
-        assertThat(email, containsString("Activate your account"));
+        assertThat(email).contains("Activate your account");
         String link = testClient.extractLink(email);
-        assertFalse(isEmpty(link));
+        assertThat(isEmpty(link)).isFalse();
         webDriver.get(link);
 
-        assertThat(webDriver.findElement(By.cssSelector("h1")).getText(), containsString("Welcome!"));
+        assertThat(webDriver.findElement(By.cssSelector("h1")).getText()).contains("Welcome!");
 
         webDriver.findElement(By.name("username")).sendKeys(userEmail);
         webDriver.findElement(By.name("password")).sendKeys(SECRET);
         webDriver.findElement(By.xpath("//input[@value='Sign in']")).click();
 
-        assertThat(webDriver.findElement(By.cssSelector("h1")).getText(), containsString("Where to?"));
+        assertThat(webDriver.findElement(By.cssSelector("h1")).getText()).contains("Where to?");
     }
 
     @Test
-    @Ignore
-    public void testSignupInZone() throws Exception {
+    @Disabled
+    void signupInZone() throws Exception {
         String subdomain = "koala-" + new SecureRandom().nextInt();
 
         String identityClientToken = testClient.getClientAccessToken("identity", identityClientSecret, "zones.write");
@@ -115,7 +112,7 @@ public class CreateAccountAcceptanceTests {
         webDriver.get(protocol + subdomain + "." + baseUrl + "/");
         webDriver.findElement(By.xpath("//*[text()='Create account']")).click();
 
-        Assert.assertEquals("Create your account", webDriver.findElement(By.tagName("h1")).getText());
+        assertThat(webDriver.findElement(By.tagName("h1")).getText()).isEqualTo("Create your account");
 
 
         webDriver.findElement(By.name("email")).sendKeys(userEmail);
@@ -124,12 +121,12 @@ public class CreateAccountAcceptanceTests {
 
         webDriver.findElement(By.xpath("//input[@value='Send activation link']")).click();
 
-        Assert.assertEquals("Create your account", webDriver.findElement(By.tagName("h1")).getText());
-        Assert.assertEquals("Please check email for an activation link.", webDriver.findElement(By.cssSelector(".instructions-sent")).getText());
+        assertThat(webDriver.findElement(By.tagName("h1")).getText()).isEqualTo("Create your account");
+        assertThat(webDriver.findElement(By.cssSelector(".instructions-sent")).getText()).isEqualTo("Please check email for an activation link.");
 
         String email = fetchEmail(userEmail.split("@")[0]);
-        assertThat(email, containsString("Activate your account"));
-        assertThat(email, containsString("https://" + subdomain + "." + baseUrl));
+        assertThat(email).contains("Activate your account")
+                .contains("https://" + subdomain + "." + baseUrl);
     }
 
     private String fetchEmail(String username) throws InterruptedException, JSONException {
@@ -140,13 +137,13 @@ public class CreateAccountAcceptanceTests {
             String jsonEmail = restTemplate.getForObject(url, String.class);
             JSONObject messages = new JSONObject(jsonEmail);
             JSONArray receivedEmails = messages.getJSONArray("messages");
-            if (receivedEmails.length() > 0) {
+            if (!receivedEmails.isEmpty()) {
                 receivedEmail = (JSONObject) receivedEmails.get(0);
             } else {
                 Thread.sleep(5000);
             }
         }
-        Assert.assertNotNull("No email was received in inbox " + username + " after " + maxTimesToCheck + " seconds. Check Mailinator to see if there is an email for that inbox: " + url, receivedEmail);
+        assertThat(receivedEmail).as("No email was received in inbox " + username + " after " + maxTimesToCheck + " seconds. Check Mailinator to see if there is an email for that inbox: " + url).isNotNull();
         String fullEmail = null;
         for (int i = 0; fullEmail == null && i < maxTimesToCheck; i++) {
             fullEmail = restTemplate.getForObject("https://api.mailinator.com/api/email?id=" + receivedEmail.getString("id") + "&token=" + mailinatorApiKey, String.class);

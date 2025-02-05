@@ -32,13 +32,13 @@ repositories {
 // In this section you declare the dependencies for your production and test code
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter")
-    implementation("org.springframework:spring-context")
+    implementation("org.springframework.boot:spring-boot-test")
     implementation("org.springframework:spring-web")
-    implementation("org.springframework:spring-test")
-    implementation(group: "org.hamcrest", name: "hamcrest", version: "3.0")
+    implementation "org.assertj:assertj-core"
+    implementation "org.junit.jupiter:junit-jupiter"
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     implementation(group: "org.seleniumhq.selenium", name: "selenium-java", version: "${versions.seleniumVersion}")
     implementation(group: "org.seleniumhq.selenium", name: "selenium-remote-driver", version: "${versions.seleniumVersion}")
-    implementation("junit:junit")
     implementation("com.fasterxml.jackson.core:jackson-core")
     implementation("com.fasterxml.jackson.core:jackson-databind")
     implementation("org.reflections:reflections:0.10.2")
@@ -46,4 +46,8 @@ dependencies {
     implementation("org.json:json:20250107")
     implementation("org.apache.commons:commons-lang3")
     implementation("commons-codec:commons-codec")
+}
+
+tasks.withType(Test).configureEach {
+    useJUnitPlatform()
 }

@@ -1,20 +1,18 @@
 package org.cloudfoundry.identity.acceptance;
 
-import org.hamcrest.Matchers;
-import org.junit.Assume;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assumptions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -22,10 +20,10 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
-@Ignore
-@RunWith(SpringJUnit4ClassRunner.class)
+@Disabled
+@ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = DefaultAcceptanceTestConfig.class)
 public class SiteMinderIntegrationTests {
 
@@ -54,15 +52,13 @@ public class SiteMinderIntegrationTests {
     private String adminToken;
     private String baseUrlWithProtocol;
 
-    private String siteMinderOriginKey = "idats-siteminder";
+    private final String siteMinderOriginKey = "idats-siteminder";
 
-    private String clientId = "test-client-" + UUID.randomUUID();
-    private String clientSecret = clientId + "-password";
+    private final String clientId = "test-client-" + UUID.randomUUID();
+    private final String clientSecret = clientId + "-password";
 
-    private String zoneId = "idats";
-
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         adminToken = testClient.getClientAccessToken(adminClientId, adminClientSecret, "");
         baseUrlWithProtocol = protocol + baseUrl;
         System.out.println("Logging out from previous session.");
@@ -70,11 +66,11 @@ public class SiteMinderIntegrationTests {
         System.out.println("Log out complete.");
 
         System.out.println("URL: " + baseUrlWithProtocol);
-        Assume.assumeTrue("This test is against GCP environment", baseUrlWithProtocol.contains(".uaa-acceptance.cf-app.com"));
+        Assumptions.assumeTrue(baseUrlWithProtocol.contains(".uaa-acceptance.cf-app.com"), "This test is against GCP environment");
     }
 
     @Test
-    public void testGCPSiteMinder() throws Exception {
+    void gcpSiteMinder() throws Exception {
         setupIdp(testClient, baseUrlWithProtocol, adminToken, siteMinderMetadata);
         testClient.createPasswordClient(adminToken, clientId, clientSecret);
 
@@ -87,7 +83,8 @@ public class SiteMinderIntegrationTests {
     }
 
     @Test
-    public void testGCPSiteMinderOnNonSystemZone() throws Exception {
+    void gcpSiteMinderOnNonSystemZone() throws Exception {
+        String zoneId = "idats";
         String zoneUrl = protocol + zoneId + "." + baseUrl;
         TestClient zoneClient = new TestClient(restTemplate, zoneUrl);
 
@@ -122,20 +119,20 @@ public class SiteMinderIntegrationTests {
             webDriver.findElement(By.name("PASSWORD")).sendKeys("Password01");
             webDriver.findElement(By.xpath("//input[@value='Login']")).click();
         }
-        assertThat(webDriver.findElement(By.cssSelector("h1")).getText(), Matchers.containsString("Where to?"));
+        assertThat(webDriver.findElement(By.cssSelector("h1")).getText()).contains("Where to?");
     }
 
     private void assertCustomAttributeMappings(String url, TestClient zoneClient) throws RuntimeException {
         webDriver.get(url + "/passcode");
-        assertThat(webDriver.findElement(By.cssSelector("h1")).getText(), Matchers.containsString("Temporary Authentication Code"));
+        assertThat(webDriver.findElement(By.cssSelector("h1")).getText()).contains("Temporary Authentication Code");
         String passcode = webDriver.findElement(By.cssSelector("h2")).getText();
         System.out.println("Passcode: " + passcode);
 
         String passwordToken = zoneClient.getPasswordToken(clientId, clientSecret, passcode);
         Map<String, Object> userInfo = zoneClient.getUserInfo(passwordToken);
         Map<String, Object> userAttributes = (Map<String, Object>) userInfo.get("user_attributes");
-        assertThat(userAttributes, Matchers.hasEntry("email", Arrays.asList("techuser1@gmail.com")));
-        assertThat(userAttributes, Matchers.hasEntry("fixedCustomAttributeToTestValue", Arrays.asList("testvalue")));
+        assertThat(userAttributes).containsEntry("email", List.of("techuser1@gmail.com"))
+                .containsEntry("fixedCustomAttributeToTestValue", List.of("testvalue"));
     }
 
     private void setupIdp(TestClient zoneClient, String zoneUrl, String adminToken, String idpMetadata) {
