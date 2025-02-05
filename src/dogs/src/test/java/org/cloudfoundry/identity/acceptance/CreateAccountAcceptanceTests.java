@@ -32,12 +32,11 @@ import java.security.SecureRandom;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.assertj.core.api.Assertions.assertThat;
 
-
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = DefaultAcceptanceTestConfig.class)
-public class CreateAccountAcceptanceTests {
+class CreateAccountAcceptanceTests {
 
-    public static final String SECRET = "s3Cret";
+    private static final String SECRET = "s3Cret";
 
     @Autowired
     WebDriver webDriver;
@@ -76,7 +75,6 @@ public class CreateAccountAcceptanceTests {
 
         assertThat(webDriver.findElement(By.tagName("h1")).getText()).isEqualTo("Create your account");
 
-
         webDriver.findElement(By.name("email")).sendKeys(userEmail);
         webDriver.findElement(By.name("password")).sendKeys(SECRET);
         webDriver.findElement(By.name("password_confirmation")).sendKeys(SECRET);
@@ -114,7 +112,6 @@ public class CreateAccountAcceptanceTests {
 
         assertThat(webDriver.findElement(By.tagName("h1")).getText()).isEqualTo("Create your account");
 
-
         webDriver.findElement(By.name("email")).sendKeys(userEmail);
         webDriver.findElement(By.name("password")).sendKeys(SECRET);
         webDriver.findElement(By.name("password_confirmation")).sendKeys(SECRET);
@@ -132,7 +129,8 @@ public class CreateAccountAcceptanceTests {
     private String fetchEmail(String username) throws InterruptedException, JSONException {
         int maxTimesToCheck = 120;
         JSONObject receivedEmail = null;
-        String url = "https://api.mailinator.com/api/inbox?to=" + username + "&token=" + mailinatorApiKey;
+        String url = "https://api.mailinator.com/api/inbox?to=%s&token=%s".formatted(username, mailinatorApiKey);
+
         for (int i = 0; receivedEmail == null && i < maxTimesToCheck; i++) {
             String jsonEmail = restTemplate.getForObject(url, String.class);
             JSONObject messages = new JSONObject(jsonEmail);
@@ -143,10 +141,11 @@ public class CreateAccountAcceptanceTests {
                 Thread.sleep(5000);
             }
         }
+
         assertThat(receivedEmail).as("No email was received in inbox " + username + " after " + maxTimesToCheck + " seconds. Check Mailinator to see if there is an email for that inbox: " + url).isNotNull();
         String fullEmail = null;
         for (int i = 0; fullEmail == null && i < maxTimesToCheck; i++) {
-            fullEmail = restTemplate.getForObject("https://api.mailinator.com/api/email?id=" + receivedEmail.getString("id") + "&token=" + mailinatorApiKey, String.class);
+            fullEmail = restTemplate.getForObject("https://api.mailinator.com/api/email?id=%s&token=%s".formatted(receivedEmail.getString("id"), mailinatorApiKey), String.class);
             if (fullEmail == null) {
                 Thread.sleep(5000);
             }

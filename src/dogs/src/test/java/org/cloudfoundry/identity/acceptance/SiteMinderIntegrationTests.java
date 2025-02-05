@@ -25,9 +25,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Disabled("Since Oct 2017, add ignore to siteminder AT until Siteminder comes back up")
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = DefaultAcceptanceTestConfig.class)
-public class SiteMinderIntegrationTests {
+class SiteMinderIntegrationTests {
 
-    public static final String CA_SITEMINDER_SAML_FOR_IDATS = "CA Siteminder SAML for IDaTS";
+    private static final String CA_SITEMINDER_SAML_FOR_IDATS = "CA Siteminder SAML for IDaTS";
 
     @Value("${BASE_URL}")
     private String baseUrl;

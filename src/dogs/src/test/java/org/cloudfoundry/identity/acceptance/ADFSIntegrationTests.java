@@ -27,9 +27,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Disabled("Since Oct 2017, Pend ADFS to unblock uaa-acceptance-gcp pipeline")
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = DefaultAcceptanceTestConfig.class)
-public class ADFSIntegrationTests {
+class ADFSIntegrationTests {
 
-    public static final String AD_FS_SAML_FOR_IDATS = "ADFS SAML for IDaTS";
+    private static final String AD_FS_SAML_FOR_IDATS = "ADFS SAML for IDaTS";
 
     @Value("${BASE_URL}")
     private String baseUrl;
