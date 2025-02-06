@@ -1,4 +1,4 @@
-/*******************************************************************************
+/* ******************************************************************************
  *     Cloud Foundry
  *     Copyright (c) [2009-2017] Pivotal Software, Inc. All Rights Reserved.
  *
@@ -10,29 +10,30 @@
  *     subcomponents is subject to the terms and conditions of the
  *     subcomponent's license, as noted in the LICENSE file.
  *******************************************************************************/
+package org.cloudfoundry.identity.acceptance;
 
-
-import org.hamcrest.Matchers;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.security.SecureRandom;
 
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
-@RunWith(SpringJUnit4ClassRunner.class)
+@ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = DefaultAcceptanceTestConfig.class)
-public class LoginAcceptanceTests {
+class LoginAcceptanceTests {
+
     @Value("${BASE_URL}")
     private String baseUrl;
+
     @Value("${PROTOCOL}")
     private String protocol;
 
@@ -49,20 +50,17 @@ public class LoginAcceptanceTests {
     private TestClient testClient;
 
     private String userName;
-    private String scimClientId;
-    private String adminClientToken;
-    private String scimClientToken;
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    void setUp() {
         int randomInt = new SecureRandom().nextInt();
 
-        adminClientToken = testClient.getClientAccessToken(adminClientId, adminClientSecret, "clients.write,uaa.admin");
+        String adminClientToken = testClient.getClientAccessToken(adminClientId, adminClientSecret, "clients.write,uaa.admin");
 
-        scimClientId = "acceptance-scim-" + randomInt;
+        String scimClientId = "acceptance-scim-" + randomInt;
         testClient.createScimClient(adminClientToken, scimClientId);
 
-        scimClientToken = testClient.getClientAccessToken(scimClientId, "scimsecret", "scim.read,scim.write");
+        String scimClientToken = testClient.getClientAccessToken(scimClientId, "scimsecret", "scim.read,scim.write");
 
         userName = "acceptance-" + randomInt + "@example.com";
         testClient.createUser(scimClientToken, userName, userName, "password", true);
@@ -70,14 +68,13 @@ public class LoginAcceptanceTests {
         webDriver.get(protocol + baseUrl + "/logout.do");
     }
 
-    @After
-    public void tearDown() throws Exception {
-        // TODO: Delete User
-        // TODO: Delete SCIM Client
+    @AfterEach
+    void tearDown() throws Exception {
+        // TODO: Delete User & SCIM Client
     }
 
     @Test
-    public void testLogin() throws Exception {
+    void login() {
 
         // Test failed login
         webDriver.get(protocol + baseUrl + "/login");
@@ -86,18 +83,18 @@ public class LoginAcceptanceTests {
         webDriver.findElement(By.name("password")).sendKeys("invalidpassword");
         webDriver.findElement(By.xpath("//input[@value='Sign in']")).click();
 
-        assertThat(webDriver.findElement(By.cssSelector("h1")).getText(), Matchers.containsString("Welcome!"));
+        assertThat(webDriver.findElement(By.cssSelector("h1")).getText()).contains("Welcome!");
 
         // Test successful login
         webDriver.findElement(By.name("username")).sendKeys(userName);
         webDriver.findElement(By.name("password")).sendKeys("password");
         webDriver.findElement(By.xpath("//input[@value='Sign in']")).click();
 
-        assertThat(webDriver.findElement(By.cssSelector("h1")).getText(), Matchers.containsString("Where to?"));
+        assertThat(webDriver.findElement(By.cssSelector("h1")).getText()).contains("Where to?");
 
         // Test logout
         webDriver.get(protocol + baseUrl + "/logout.do");
 
-        assertThat(webDriver.findElement(By.cssSelector("h1")).getText(), Matchers.containsString("Welcome!"));
+        assertThat(webDriver.findElement(By.cssSelector("h1")).getText()).contains("Welcome!");
     }
 }

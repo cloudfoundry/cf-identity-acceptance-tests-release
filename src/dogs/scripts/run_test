@@ -1,5 +1,4 @@
 #!/bin/bash
-
 set -e
 
 echo "Running Identity acceptance tests"
@@ -10,15 +9,12 @@ echo "Running Identity acceptance tests"
 
 export TERM=dumb
 
-mkdir -p ~/.gradle
-echo "org.gradle.daemon=false" >> ~/.gradle/gradle.properties
-
-cat > ~/.gradle/init.gradle <<EOL
+cat > init.gradle <<EOL
 allprojects {
   tasks.withType(Test) {
     testLogging {
-      events "passed", "skipped", "failed"
-      exceptionFormat "full"
+      events("passed", "skipped", "failed")
+      exceptionFormat="full"
     }
   }
 }
@@ -26,4 +22,4 @@ EOL
 
 echo "Running IDATS tests against ${PROTOCOL}${BASE_URL}"
 
-./gradlew clean test
+./gradlew --init-script init.gradle --no-daemon clean test

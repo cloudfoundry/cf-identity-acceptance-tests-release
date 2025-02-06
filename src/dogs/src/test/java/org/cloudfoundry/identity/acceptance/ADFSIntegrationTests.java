@@ -1,29 +1,36 @@
-import org.hamcrest.Matchers;
-import org.junit.Assume;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+package org.cloudfoundry.identity.acceptance;
+
+import org.junit.jupiter.api.Assumptions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Scanner;
+import java.util.UUID;
 
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
-@Ignore
-@RunWith(SpringJUnit4ClassRunner.class)
+@Disabled("Since Oct 2017, Pend ADFS to unblock uaa-acceptance-gcp pipeline")
+@ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = DefaultAcceptanceTestConfig.class)
-public class ADFSIntegrationTests {
+class ADFSIntegrationTests {
 
-    public static final String AD_FS_SAML_FOR_IDATS = "ADFS SAML for IDaTS";
+    private static final String AD_FS_SAML_FOR_IDATS = "ADFS SAML for IDaTS";
+
     @Value("${BASE_URL}")
     private String baseUrl;
 
@@ -48,15 +55,14 @@ public class ADFSIntegrationTests {
     private String adminToken;
     private String baseUrlWithProtocol;
 
-    private String adfsOriginKey = "idats-adfs";
+    private final String adfsOriginKey = "idats-adfs";
 
-    private String clientId = "test-client-" + UUID.randomUUID();
-    private String clientSecret = clientId + "-password";
+    private final String clientId = "test-client-" + UUID.randomUUID();
+    private final String clientSecret = clientId + "-password";
+    private String adfsMetadata = "";
 
-    private String zoneId = "idats";
-
-    @Before
-    public void setUp() throws FileNotFoundException {
+    @BeforeEach
+    void setUp() throws FileNotFoundException {
         String metadataFileName = "adfsmetadata.xml";
         ClassLoader classLoader = getClass().getClassLoader();
         File metadataFile = new File(classLoader.getResource(metadataFileName).getFile());
@@ -69,11 +75,11 @@ public class ADFSIntegrationTests {
         System.out.println("Log out complete.");
 
         System.out.println("URL: " + baseUrlWithProtocol);
-        Assume.assumeTrue("This test is against GCP environment", baseUrlWithProtocol.contains(".uaa-acceptance.cf-app.com"));
+        Assumptions.assumeTrue(baseUrlWithProtocol.contains(".uaa-acceptance.cf-app.com"), "This test is against GCP environment");
     }
 
     @Test
-    public void testGCPAdfs() throws Exception {
+    void gcpAdfs() {
         setupIdp(testClient, baseUrlWithProtocol, adminToken, adfsMetadata);
         testClient.createPasswordClient(adminToken, clientId, clientSecret);
 
@@ -86,7 +92,8 @@ public class ADFSIntegrationTests {
     }
 
     @Test
-    public void testGCPAdfsNonSystemZone() throws Exception {
+    void gcpAdfsNonSystemZone() {
+        String zoneId = "idats";
         String zoneUrl = protocol + zoneId + "." + baseUrl;
         TestClient zoneClient = new TestClient(restTemplate, zoneUrl);
 
@@ -114,27 +121,27 @@ public class ADFSIntegrationTests {
         webDriver.findElement(By.xpath("//a[text()='" + AD_FS_SAML_FOR_IDATS + "']")).click();
 
         if (!webDriver.getCurrentUrl().contains(url)) {
-            assertThat(webDriver.findElement(By.id("loginMessage")).getText(), Matchers.containsString("Sign in with your organizational account"));
+            assertThat(webDriver.findElement(By.id("loginMessage")).getText()).contains("Sign in with your organizational account");
 
             webDriver.findElement(By.name("UserName")).clear();
             webDriver.findElement(By.name("UserName")).sendKeys("techuser1@adfs.cf-app.com");
             webDriver.findElement(By.name("Password")).sendKeys("Password01");
             webDriver.findElement(By.id("submitButton")).click();
         }
-        assertThat(webDriver.findElement(By.cssSelector("h1")).getText(), Matchers.containsString("Where to?"));
+        assertThat(webDriver.findElement(By.cssSelector("h1")).getText()).contains("Where to?");
     }
 
     private void assertCustomAttributeMappings(String url, TestClient zoneClient) throws RuntimeException {
         webDriver.get(url + "/passcode");
-        assertThat(webDriver.findElement(By.cssSelector("h1")).getText(), Matchers.containsString("Temporary Authentication Code"));
+        assertThat(webDriver.findElement(By.cssSelector("h1")).getText()).contains("Temporary Authentication Code");
         String passcode = webDriver.findElement(By.cssSelector("h2")).getText();
         System.out.println("Passcode: " + passcode);
 
         String passwordToken = zoneClient.getPasswordToken(clientId, clientSecret, passcode);
         Map<String, Object> userInfo = zoneClient.getUserInfo(passwordToken);
         Map<String, Object> userAttributes = (Map<String, Object>) userInfo.get("user_attributes");
-        assertThat(userAttributes, Matchers.hasEntry("email", Arrays.asList("techuser1@adfs.cf-app.com")));
-        assertThat(userAttributes, Matchers.hasEntry("fixedCustomAttributeToTestValue", Arrays.asList("microsoft")));
+        assertThat(userAttributes).containsEntry("email", List.of("techuser1@adfs.cf-app.com"))
+                .containsEntry("fixedCustomAttributeToTestValue", List.of("microsoft"));
     }
 
     private void setupIdp(TestClient zoneClient, String zoneUrl, String adminToken, String idpMetadata) {
@@ -148,7 +155,7 @@ public class ADFSIntegrationTests {
                 zoneClient.updateIdentityProvider(zoneUrl, adminToken, (String) existingIdp.get().get("id"), getAdfsIDP(idpMetadata)) :
                 zoneClient.createIdentityProvider(zoneUrl, adminToken, getAdfsIDP(idpMetadata));
 
-        String adfsIdp = String.format("Created IDP:\n\tid:%s\n\tname:%s\n\ttype:%s\n\torigin:%s\n\tactive:%s",
+        String adfsIdp = "Created IDP:%n\tid:%s%n\tname:%s%n\ttype:%s%n\torigin:%s%n\tactive:%s".formatted(
                 idp.get("id"),
                 idp.get("name"),
                 idp.get("type"),
@@ -183,7 +190,4 @@ public class ADFSIntegrationTests {
         result.put("config", config);
         return result;
     }
-
-    private String adfsMetadata = "";
-
 }
