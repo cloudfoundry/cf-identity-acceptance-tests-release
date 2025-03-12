@@ -25,6 +25,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.cloudfoundry.identity.acceptance.DefaultAcceptanceTestConfig.clickAndWait;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = DefaultAcceptanceTestConfig.class)
@@ -62,7 +63,7 @@ class SamlLoginAcceptanceTests {
         webDriver.findElement(By.name("username")).clear();
         webDriver.findElement(By.name("username")).sendKeys("marissa");
         webDriver.findElement(By.name("password")).sendKeys("koala");
-        webDriver.findElement(By.xpath("//input[@value='Login']")).click();
+        clickAndWait(webDriver, By.xpath("//input[@value='Login']"));
         assertThat(webDriver.findElement(By.xpath("//div[@class='dropdown-trigger']")).getText()).isEqualTo("marissa@test.org");
         assertThat(webDriver.findElement(By.cssSelector("h1")).getText()).contains("Where to?");
     }

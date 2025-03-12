@@ -24,6 +24,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.cloudfoundry.identity.acceptance.DefaultAcceptanceTestConfig.clickAndWait;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = DefaultAcceptanceTestConfig.class)
@@ -48,7 +49,7 @@ class LdapLoginAcceptanceTests {
     void ldap_login_IsSuccessful() {
         webDriver.findElement(By.name("username")).sendKeys("marissa-ldap");
         webDriver.findElement(By.name("password")).sendKeys("marissa-ldap");
-        webDriver.findElement(By.xpath("//input[@value='Sign in']")).click();
+        clickAndWait(webDriver, By.xpath("//input[@value='Sign in']"));
 
         assertThat(webDriver.findElement(By.cssSelector("h1")).getText()).contains("Where to?");
 

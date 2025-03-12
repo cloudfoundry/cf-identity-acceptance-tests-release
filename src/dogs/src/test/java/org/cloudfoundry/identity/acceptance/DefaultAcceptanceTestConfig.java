@@ -13,9 +13,13 @@
 package org.cloudfoundry.identity.acceptance;
 
 import jakarta.annotation.PostConstruct;
+import org.openqa.selenium.By;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.support.ui.FluentWait;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -78,5 +82,30 @@ public class DefaultAcceptanceTestConfig {
     @PostConstruct
     public void init() {
         SSLValidationDisabler.disableSSLValidation();
+    }
+
+    /**
+     * Click on the element, and wait for a page reload. This is accomplished by waiting
+     * for the reference to the clicked element to become "stale", ie not be in the current
+     * DOM anymore, throwing {@link StaleElementReferenceException}. Sometimes, the Chrome driver
+     * throws a 500 error, which body contains code -32000, so we use that as a signal as well.
+     */
+    protected static void clickAndWait(WebDriver webDriver, By locator) {
+        var clickableElement = webDriver.findElement(locator);
+        clickableElement.click();
+
+        new FluentWait<>(webDriver).withTimeout(Duration.ofSeconds(5))
+                .pollingEvery(Duration.ofMillis(100))
+                .withMessage(() -> "Waiting for navigation after clicking on [%s]. Current URL [%s].".formatted(locator, webDriver.getCurrentUrl()))
+                .until((d) -> {
+                    try {
+                        clickableElement.isDisplayed();
+                        return false;
+                    } catch (StaleElementReferenceException e) {
+                        return true;
+                    } catch (WebDriverException e) {
+                        return e.getMessage().contains("-32000");
+                    }
+                });
     }
 }
