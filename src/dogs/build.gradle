@@ -9,7 +9,7 @@ buildscript {
     dependencies {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
     }
-    versions.seleniumVersion = "4.34.0"
+    versions.seleniumVersion = "4.35.0"
     ext['selenium.version'] = "${versions.seleniumVersion}" // Selenium for integration tests only
 }
 
