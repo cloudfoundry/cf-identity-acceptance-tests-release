@@ -37,8 +37,8 @@ dependencies {
     implementation "org.assertj:assertj-core"
     implementation "org.junit.jupiter:junit-jupiter"
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-    implementation(group: "org.seleniumhq.selenium", name: "selenium-java", version: "${versions.seleniumVersion}")
-    implementation(group: "org.seleniumhq.selenium", name: "selenium-remote-driver", version: "${versions.seleniumVersion}")
+    implementation("org.seleniumhq.selenium:selenium-java:${versions.seleniumVersion}")
+    implementation("org.seleniumhq.selenium:selenium-remote-driver:${versions.seleniumVersion}")
     implementation("com.fasterxml.jackson.core:jackson-core")
     implementation("com.fasterxml.jackson.core:jackson-databind")
     implementation("org.reflections:reflections:0.10.2")
