@@ -9,8 +9,6 @@ buildscript {
     dependencies {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
     }
-    versions.seleniumVersion = "4.28.1"
-    ext['selenium.version'] = "${versions.seleniumVersion}" // Selenium for integration tests only
 }
 
 // Apply the java plugin to add support for Java
@@ -37,8 +35,8 @@ dependencies {
     implementation "org.assertj:assertj-core"
     implementation "org.junit.jupiter:junit-jupiter"
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-    implementation("org.seleniumhq.selenium:selenium-java:${versions.seleniumVersion}")
-    implementation("org.seleniumhq.selenium:selenium-remote-driver:${versions.seleniumVersion}")
+    implementation("org.seleniumhq.selenium:selenium-java")
+    implementation("org.seleniumhq.selenium:selenium-remote-driver")
     implementation("com.fasterxml.jackson.core:jackson-core")
     implementation("com.fasterxml.jackson.core:jackson-databind")
     implementation("org.reflections:reflections:0.10.2")
