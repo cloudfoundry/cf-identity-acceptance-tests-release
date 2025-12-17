@@ -4,13 +4,11 @@ import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.File;
@@ -24,9 +22,11 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+/**
+ * Active Directory Federation Services Integration Tests
+ */
 @Disabled("Since Oct 2017, Pend ADFS to unblock uaa-acceptance-gcp pipeline")
-@ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = DefaultAcceptanceTestConfig.class)
+@SpringJUnitConfig(classes = DefaultAcceptanceTestConfig.class)
 class ADFSIntegrationTests {
 
     private static final String AD_FS_SAML_FOR_IDATS = "ADFS SAML for IDaTS";

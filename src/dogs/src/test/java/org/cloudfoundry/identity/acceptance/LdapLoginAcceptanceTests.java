@@ -15,19 +15,16 @@ package org.cloudfoundry.identity.acceptance;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.cloudfoundry.identity.acceptance.DefaultAcceptanceTestConfig.clickAndWait;
 
-@ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = DefaultAcceptanceTestConfig.class)
+@SpringJUnitConfig(classes = DefaultAcceptanceTestConfig.class)
 class LdapLoginAcceptanceTests {
 
     @Value("${BASE_URL}")
