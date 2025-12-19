@@ -70,11 +70,11 @@ class ADFSIntegrationTests {
 
         adminToken = testClient.getClientAccessToken(adminClientId, adminClientSecret, "");
         baseUrlWithProtocol = protocol + baseUrl;
-        System.out.println("Logging out from previous session.");
+        IO.println("Logging out from previous session.");
         webDriver.get(baseUrlWithProtocol + "/logout.do");
-        System.out.println("Log out complete.");
+        IO.println("Log out complete.");
 
-        System.out.println("URL: " + baseUrlWithProtocol);
+        IO.println("URL: " + baseUrlWithProtocol);
         Assumptions.assumeTrue(baseUrlWithProtocol.contains(".uaa-acceptance.cf-app.com"), "This test is against GCP environment");
     }
 
@@ -135,7 +135,7 @@ class ADFSIntegrationTests {
         webDriver.get(url + "/passcode");
         assertThat(webDriver.findElement(By.cssSelector("h1")).getText()).contains("Temporary Authentication Code");
         String passcode = webDriver.findElement(By.cssSelector("h2")).getText();
-        System.out.println("Passcode: " + passcode);
+        IO.println("Passcode: " + passcode);
 
         String passwordToken = zoneClient.getPasswordToken(clientId, clientSecret, passcode);
         Map<String, Object> userInfo = zoneClient.getUserInfo(passwordToken);
@@ -162,7 +162,7 @@ class ADFSIntegrationTests {
                 idp.get("originKey"),
                 idp.get("active")
         );
-        System.out.println(adfsIdp);
+        IO.println(adfsIdp);
     }
 
     private Map<String, Object> getAdfsIDP(String idpMetadata) {
