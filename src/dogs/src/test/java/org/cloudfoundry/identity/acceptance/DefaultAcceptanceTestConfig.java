@@ -97,11 +97,11 @@ public class DefaultAcceptanceTestConfig {
         new FluentWait<>(webDriver).withTimeout(Duration.ofSeconds(5))
                 .pollingEvery(Duration.ofMillis(100))
                 .withMessage(() -> "Waiting for navigation after clicking on [%s]. Current URL [%s].".formatted(locator, webDriver.getCurrentUrl()))
-                .until((d) -> {
+                .until(_ -> {
                     try {
                         clickableElement.isDisplayed();
                         return false;
-                    } catch (StaleElementReferenceException e) {
+                    } catch (StaleElementReferenceException _) {
                         return true;
                     } catch (WebDriverException e) {
                         return e.getMessage().contains("-32000");
