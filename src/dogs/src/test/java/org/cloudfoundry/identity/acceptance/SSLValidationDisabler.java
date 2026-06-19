@@ -42,8 +42,8 @@ public class SSLValidationDisabler {
             SSLContext sc = SSLContext.getInstance("SSL");
             sc.init(null, trustAllCerts, new SecureRandom());
             HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
-            HttpsURLConnection.setDefaultHostnameVerifier((hostname, session) -> true);
-        } catch (GeneralSecurityException e) {
+            HttpsURLConnection.setDefaultHostnameVerifier((_, _) -> true);
+        } catch (GeneralSecurityException _) {
             // ignore
         }
     }
